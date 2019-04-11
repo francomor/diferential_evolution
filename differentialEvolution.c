@@ -45,7 +45,6 @@ int main (int argc, char **argv) {
 		exit (1);
 	}
 
-	//double *lower_bound = init_array_with_value (D, -1);
 	//rand48 is uniform[0,1]
 	srand48(time(NULL));
 	run_diferential_evolution (max_generations, D, NP);
@@ -71,13 +70,9 @@ int convert_string_argv_to_int (char** argv, int position) {
 void run_diferential_evolution (int max_generations, int D, int NP) {
 	int count = 0, generation_of_best_fitness = 0;
 	double **population = init_matrix (NP, D);
-	//double population[NP][D] = {{0}};
 	double *individuals_fitness = init_array (NP);
-	//double individuals_fitness[NP] = {0};
 	double *lower_bound = init_array_with_value (D, -1);
-	//double lower_bound[D] = {[0 ... (D-1)] = -1};
 	double *upper_bound = init_array_with_value (D, 1);
-	//double upper_bound[D] = {[0 ... (D-1)] = 1};
 	double best_global_fitness = DBL_MAX, this_population_best_fitness;
 
 	initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D);
@@ -169,11 +164,9 @@ void initialize_individuals_randomly (double **population, double *lower_bound, 
 }
 
 void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D) {
-	//double next_population[NP][D] = {{0}};
 	double **next_population = init_matrix (NP, D);
-	
-	//double trial_vector[D] = {0};
 	double *trial_vector = init_array (D);
+	
 	/* Start loop through population. */
     for (int i=0; i<D; i++) {
     	set_all_array_values_to (trial_vector, D, 0);
