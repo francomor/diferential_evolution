@@ -5,4 +5,4 @@ DE/rand/1/bin para problema de minimizacion
 gcc differentialEvolution.c -o differentialEvolution.out
 
 # Ejecutar
-./differentialEvolution
+./differentialEvolution.out D NP max_generations
