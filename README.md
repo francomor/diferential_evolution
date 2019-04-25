@@ -5,4 +5,10 @@ DE/rand/1/bin para problema de minimizacion
 gcc differentialEvolution.c -o differentialEvolution.out
 
 # Ejecutar
-./differentialEvolution.out D NP max_generations
+./differentialEvolution.out D NP max_generations F(x100) CR(x100)
+
+# Compilar para valgrind
+gcc -Wall -g differentialEvolution.c -o differentialEvolution.out
+
+# Ejecutar para valgrind
+valgrind --leak-check=yes ./differentialEvolution.out D NP max_generations F(x100) CR(x100)
