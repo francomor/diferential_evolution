@@ -15,13 +15,15 @@ int convert_string_argv_to_int (char** argv, int position);
 void run_diferential_evolution (int max_generations, int D, int NP, float F, float CR);
 double** init_matrix (int number_rows, int number_columns);
 void free_matrix (double **matrix, int number_rows);
+void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value);
+double** init_matrix_with_value (int number_rows, int number_columns, double value);
 double* init_array (int size);
 double* init_array_with_value (int size, double value);
 void set_all_array_values_to (double *array, int size, double value);
 void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D);
 void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR);
 void mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR);
-void evaluate_and_select (double *individual, double *fitness_of_individual, double *trial_vector, double *individual_for_next_population, int D);
+void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, double *individual_for_next_population, int D);
 void copy_population (double **source, double **destination, int NP, int D);
 void copy_individual (double *source, double *destination, int D);
 double evaluate (double *individual, int D);
@@ -106,7 +108,7 @@ void run_diferential_evolution (int max_generations, int D, int NP, float F, flo
 	//print_population (population, NP, D);
 
 	//printf("Mejor fitness %f encontrado en la generacion %d\n", best_global_fitness, generation_of_best_fitness);
-	printf("%d %d %d %f %f %f %d\n", D, NP, F, CR, max_generations, best_global_fitness, generation_of_best_fitness);
+	printf("%d %d %f %f %d %f %d\n", D, NP, F, CR, max_generations, best_global_fitness, generation_of_best_fitness);
 	
 	free_matrix (population, NP);
 	free (individuals_fitness);
@@ -138,6 +140,18 @@ void free_matrix (double **matrix, int number_rows) {
 	}
 	free (matrix);
 	matrix = NULL;
+}
+
+void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value) {
+	for (int i=0; i<number_rows; i++) {
+		set_all_array_values_to (matrix[i], number_columns, value);
+	}
+}
+
+double** init_matrix_with_value (int number_rows, int number_columns, double value) {
+	double **matrix = init_matrix (number_rows, number_columns);
+	set_all_matrix_values_to (matrix, number_rows, number_columns, value);
+	return matrix;
 }
 
 double* init_array (int size) {
@@ -172,21 +186,24 @@ void initialize_individuals_randomly (double **population, double *lower_bound, 
 
 void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR) {
 	double **next_population = init_matrix (NP, D);
-	double *trial_vector = init_array (D);
+	double **trial_population = init_matrix_with_value (NP, D, 0);
+	double *trials_fitness = init_array (NP);
 	
 	/* Start loop through population. */
     for (int i=0; i<NP; i++) {
-    	set_all_array_values_to (trial_vector, D, 0);
-        mutate_and_recombine (population, i, trial_vector, NP, D, F, CR);
-        evaluate_and_select (population[i], &individuals_fitness[i], trial_vector, next_population[i], D);
-        
+        mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
     }
+    for (int i=0; i<NP; i++) {
+    	trials_fitness[i] = evaluate (trial_population[i], D);
+    }
+    for (int i=0; i<NP; i++) {
+        DE_select (population[i], &individuals_fitness[i], trial_population[i], &trials_fitness[i], next_population[i], D);
+    }
+        
     /********** End of population loop; swap arrays **********/
     copy_population (next_population, population, NP, D);
 
-
-    free (trial_vector);
-	trial_vector = NULL;
+	free_matrix (trial_population, NP);
 	free_matrix (next_population, NP);
 }
 
@@ -212,16 +229,10 @@ void mutate_and_recombine (double **population, int individual_index, double *tr
     }
 }
 
-void evaluate_and_select (double *individual, double *fitness_of_individual, double *trial_vector, double *individual_for_next_population, int D) {
-	double fitness_of_trial_vector;
-    fitness_of_trial_vector = evaluate(trial_vector, D);
-
-    //printf("*fitness_of_trial_vector %f\n", fitness_of_trial_vector);
-    //printf("*fitness_of_individual %f\n", *fitness_of_individual);
-    
-    if (fitness_of_trial_vector <= *fitness_of_individual) {
+void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, double *individual_for_next_population, int D) {
+    if (*fitness_of_trial_vector <= *fitness_of_individual) {
 		copy_individual (trial_vector, individual_for_next_population, D);
-        *fitness_of_individual = fitness_of_trial_vector;
+        *fitness_of_individual = *fitness_of_trial_vector;
     } else {            
 		copy_individual (individual, individual_for_next_population, D);
     }
@@ -269,7 +280,6 @@ void print_population (double **population, int NP, int D) {
 double best_fitness_of_population (double *individuals_fitness, int NP) {
 	double best_fitness = DBL_MAX;
 	for (int i=0; i<NP; i++) {
-		//printf("individuals_fitness[%d] %f\n", i, individuals_fitness[i]);
         if (individuals_fitness[i] < best_fitness) {
 			best_fitness = individuals_fitness[i];
 		}
