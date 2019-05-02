@@ -17,3 +17,6 @@ valgrind --leak-check=yes ./differentialEvolution.out D NP max_generations F(x10
 git add .
 git commit -m "Nombre del commit"
 git push origin master
+
+#SSH
+ssh franco@190.105.160.50 -p 2222

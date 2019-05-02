@@ -121,12 +121,13 @@ void run_diferential_evolution (int max_generations, int D, int NP, float F, flo
 
 double** init_matrix (int number_rows, int number_columns) {
 	double **matrix = (double **) malloc (number_rows * sizeof(double*));
+	int i, j;
 	if (matrix  == NULL) {
 		printf ("Problemas reservando memoria");
 		exit (1);
 	}
-	for (int i=0; i<number_rows; i++) {
-	    for (int j=0; j<number_columns; j++) {
+	for (i=0; i<number_rows; i++) {
+	    for (j=0; j<number_columns; j++) {
 	    	matrix[i] = init_array (number_columns);
 	    }
 	}
@@ -134,7 +135,8 @@ double** init_matrix (int number_rows, int number_columns) {
 }
 
 void free_matrix (double **matrix, int number_rows) {
-	for (int i=0; i<number_rows; i++) {
+	int i;
+	for (i=0; i<number_rows; i++) {
 		free (matrix[i]);
 		matrix[i] = NULL;
 	}
@@ -143,7 +145,8 @@ void free_matrix (double **matrix, int number_rows) {
 }
 
 void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value) {
-	for (int i=0; i<number_rows; i++) {
+	int i;
+	for (i=0; i<number_rows; i++) {
 		set_all_array_values_to (matrix[i], number_columns, value);
 	}
 }
@@ -170,14 +173,16 @@ double* init_array_with_value (int size, double value) {
 }
 
 void set_all_array_values_to (double *array, int size, double value) {
-	for (int i=0; i<size; i++) {
+	int i;
+	for (i=0; i<size; i++) {
 		array[i] = value;
 	}
 }
 
 void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D) {
-	for (int i=0; i<NP; i++) {
-	    for (int j=0; j<D; j++) {
+	int i, j;
+	for (i=0; i<NP; i++) {
+	    for (j=0; j<D; j++) {
 	        population[i][j] = lower_bound[j] + drand48() * (upper_bound[j] - lower_bound[j]);
 	    }
 	    individuals_fitness[i] = evaluate(population[i], D);
@@ -188,15 +193,16 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
 	double **next_population = init_matrix (NP, D);
 	double **trial_population = init_matrix_with_value (NP, D, 0);
 	double *trials_fitness = init_array (NP);
-	
+	int i;
+
 	/* Start loop through population. */
-    for (int i=0; i<NP; i++) {
+    for (i=0; i<NP; i++) {
         mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
     }
-    for (int i=0; i<NP; i++) {
+    for (i=0; i<NP; i++) {
     	trials_fitness[i] = evaluate (trial_population[i], D);
     }
-    for (int i=0; i<NP; i++) {
+    for (i=0; i<NP; i++) {
         DE_select (population[i], &individuals_fitness[i], trial_population[i], &trials_fitness[i], next_population[i], D);
     }
         
@@ -208,7 +214,7 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
 }
 
 void mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR) {
-	int a, b, c, k;
+	int a, b, c, k, j;
     /* Randomly pick 3 vectors, all different from individual_index */ 
     do a = drand48() * NP; while (a == individual_index); 
     do b = drand48() * NP; while (b == individual_index || b == a);
@@ -217,7 +223,7 @@ void mutate_and_recombine (double **population, int individual_index, double *tr
     k = drand48() * D;
 
     /* Load D parameters into trial_vector[]. */
-    for (int j=0; j<D; j++) {
+    for (j=0; j<D; j++) {
         /* Perform NP-1 binomial trials. */
         if ((drand48() < CR) || j==k) {
             /* Source for trial_vector[j] is a random vector plus weighted differential */
@@ -239,13 +245,15 @@ void DE_select (double *individual, double *fitness_of_individual, double *trial
 }
 
 void copy_population (double **source, double **destination, int NP, int D) {
-    for (int i=0; i<NP; i++) {
+	int i;
+    for (i=0; i<NP; i++) {
         copy_individual (source[i], destination[i], D);
     } 
 }
 
 void copy_individual (double *source, double *destination, int D) {
-    for (int j=0; j<D; j++) {
+    int j;
+    for (j=0; j<D; j++) {
         destination[j] = source[j];
     }
 }
@@ -259,7 +267,8 @@ double rosenbrock_function (double *individual, int D) {
 	double x1;
 	double x2;
 	double diff_x1;
-	for (int i=0; i<D-1; i++) {
+	int i;
+	for (i=0; i<D-1; i++) {
 		x1 = individual[i];
 		x2 = individual[i+1];
 		diff_x1 = x1 - 1.0;
@@ -269,8 +278,9 @@ double rosenbrock_function (double *individual, int D) {
 }
 
 void print_population (double **population, int NP, int D) {
-	for (int row=0; row<NP; row++) {
-	    for (int columns=0; columns<D; columns++) {
+	int row, columns;
+	for (row=0; row<NP; row++) {
+	    for (columns=0; columns<D; columns++) {
 	        printf("%f     ", population[row][columns]);
 	        }
 	    printf("\n");
@@ -279,7 +289,8 @@ void print_population (double **population, int NP, int D) {
 
 double best_fitness_of_population (double *individuals_fitness, int NP) {
 	double best_fitness = DBL_MAX;
-	for (int i=0; i<NP; i++) {
+	int i;
+	for (i=0; i<NP; i++) {
         if (individuals_fitness[i] < best_fitness) {
 			best_fitness = individuals_fitness[i];
 		}
