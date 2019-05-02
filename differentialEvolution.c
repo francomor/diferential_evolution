@@ -23,7 +23,7 @@ void set_all_array_values_to (double *array, int size, double value);
 void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D);
 void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR);
 void mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR);
-void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, double *individual_for_next_population, int D);
+void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, int D);
 void copy_population (double **source, double **destination, int NP, int D);
 void copy_individual (double *source, double *destination, int D);
 double evaluate (double *individual, int D);
@@ -127,9 +127,7 @@ double** init_matrix (int number_rows, int number_columns) {
 		exit (1);
 	}
 	for (i=0; i<number_rows; i++) {
-	    for (j=0; j<number_columns; j++) {
-	    	matrix[i] = init_array (number_columns);
-	    }
+    	matrix[i] = init_array (number_columns);
 	}
 	return matrix;
 }
@@ -190,7 +188,7 @@ void initialize_individuals_randomly (double **population, double *lower_bound, 
 }
 
 void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR) {
-	double **next_population = init_matrix (NP, D);
+	//trial populations is used as nex population in select
 	double **trial_population = init_matrix_with_value (NP, D, 0);
 	double *trials_fitness = init_array (NP);
 	int i;
@@ -207,16 +205,15 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
 	    }
 	}
     for (i=0; i<NP; i++) {
-        DE_select (population[i], &individuals_fitness[i], trial_population[i], &trials_fitness[i], next_population[i], D);
+        DE_select (population[i], &individuals_fitness[i], trial_population[i], &trials_fitness[i], D);
     }
         
     /********** End of population loop; swap arrays **********/
-    copy_population (next_population, population, NP, D);
+    copy_population (trial_population, population, NP, D);
 
 	free_matrix (trial_population, NP);
 	free (trials_fitness);
 	trials_fitness = NULL;
-	free_matrix (next_population, NP);
 }
 
 void mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR) {
@@ -241,12 +238,11 @@ void mutate_and_recombine (double **population, int individual_index, double *tr
     }
 }
 
-void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, double *individual_for_next_population, int D) {
+void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, int D) {
     if (*fitness_of_trial_vector <= *fitness_of_individual) {
-		copy_individual (trial_vector, individual_for_next_population, D);
         *fitness_of_individual = *fitness_of_trial_vector;
     } else {            
-		copy_individual (individual, individual_for_next_population, D);
+		copy_individual (individual, trial_vector, D);
     }
 }
 
