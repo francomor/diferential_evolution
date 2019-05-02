@@ -214,6 +214,8 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
     copy_population (next_population, population, NP, D);
 
 	free_matrix (trial_population, NP);
+	free (trials_fitness);
+	trials_fitness = NULL;
 	free_matrix (next_population, NP);
 }
 
