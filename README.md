@@ -2,7 +2,7 @@
 DE/rand/1/bin para problema de minimizacion
 
 # Compilar
-gcc differentialEvolution.c -o differentialEvolution.out
+gcc differentialEvolution.c -o differentialEvolution.out -fopenmp
 
 # Ejecutar
 ./differentialEvolution.out D NP max_generations F(x100) CR(x100)

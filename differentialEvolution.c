@@ -8,7 +8,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <time.h>
-
+#include <omp.h>
 
 
 int convert_string_argv_to_int (char** argv, int position);
@@ -196,12 +196,16 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
 	int i;
 
 	/* Start loop through population. */
-    for (i=0; i<NP; i++) {
-        mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
-    }
-    for (i=0; i<NP; i++) {
-    	trials_fitness[i] = evaluate (trial_population[i], D);
-    }
+	omp_set_num_threads(3);
+	#pragma omp parallel
+    {
+    	//printf("%d\n", omp_get_thread_num());
+        #pragma omp for
+	    for (i=0; i<NP; i++) {
+	        mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
+	    	trials_fitness[i] = evaluate (trial_population[i], D);
+	    }
+	}
     for (i=0; i<NP; i++) {
         DE_select (population[i], &individuals_fitness[i], trial_population[i], &trials_fitness[i], next_population[i], D);
     }
