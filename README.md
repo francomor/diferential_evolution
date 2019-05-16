@@ -3,9 +3,11 @@ DE/rand/1/bin para problema de minimizacion
 
 # Compilar
 gcc differentialEvolution.c -o differentialEvolution.out -fopenmp
+g++ de_for_fjssp.c readInstance.cpp -o de_for_fjssp.out -fopenmp
 
 # Ejecutar
 ./differentialEvolution.out D NP max_generations F(x100) CR(x100)
+./de_for_fjssp.out D NP max_generations F(x100) CR(x100)
 
 # Compilar para valgrind
 gcc -Wall -g differentialEvolution.c -o differentialEvolution.out
