@@ -1,12 +1,11 @@
 # Algoritmo de evolucion diferencial
-DE/rand/1/bin para problema FJSSP
+DE/rand/1/bin para problema de minimizacion
 
 # Compilar
-make DE
+gcc differentialEvolution.c -o differentialEvolution.out -fopenmp
 
 # Ejecutar
-make runDE
-./de_for_fjssp.out filename NP max_generations F(x100) CR(x100)
+./differentialEvolution.out D NP max_generations F(x100) CR(x100)
 
 # Compilar para valgrind
 gcc -Wall -g differentialEvolution.c -o differentialEvolution.out
