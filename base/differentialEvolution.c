@@ -1,6 +1,8 @@
 /* 
  * This implements the NPE/rand/1/bin optimization algorithm for minimization problems.
  *
+ * Franco Morero
+ * 2019
  */
 #include <stdlib.h>
 #include <stdio.h>
