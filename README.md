@@ -9,10 +9,10 @@ make runDE
 ./de_for_fjssp.out filename NP max_generations F(x100) CR(x100)
 
 # Compilar para valgrind
-gcc -Wall -g differentialEvolution.c -o differentialEvolution.out
+make valgrind
 
 # Ejecutar para valgrind
-valgrind --leak-check=yes ./differentialEvolution.out D NP max_generations F(x100) CR(x100)
+make runDE_valgrind
 
 # Git
 git add .
