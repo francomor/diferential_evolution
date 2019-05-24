@@ -31,9 +31,9 @@ void initialize_individuals_randomly (double **population, double *lower_bound, 
 void DE_mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
 void DE_mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR);
 void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, int D);
+double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
 void copy_population (double **source, double **destination, int NP, int D);
 void copy_individual (double *source, double *destination, int D);
-double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
 void print_population (double **population, int NP, int D);
 double best_fitness_of_population (double *individuals_fitness, int NP);
 int* init_int_array (int size);
@@ -274,20 +274,6 @@ void DE_select (double *individual, double *fitness_of_individual, double *trial
     }
 }
 
-void copy_population (double **source, double **destination, int NP, int D) {
-    int i;
-    for (i=0; i<NP; i++) {
-        copy_individual (source[i], destination[i], D);
-    } 
-}
-
-void copy_individual (double *source, double *destination, int D) {
-    int j;
-    for (j=0; j<D; j++) {
-        destination[j] = source[j];
-    }
-}
-
 double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
     //current_fitness and evaluation_up_to_date are necessary for evaluate from standard
     double fitness, current_fitness = 0;
@@ -301,6 +287,20 @@ double DE_evaluate (double *individual, int D, int **job_data, int *number_opera
     free (solution->job);
     free (solution);
     return fitness;
+}
+
+void copy_population (double **source, double **destination, int NP, int D) {
+    int i;
+    for (i=0; i<NP; i++) {
+        copy_individual (source[i], destination[i], D);
+    } 
+}
+
+void copy_individual (double *source, double *destination, int D) {
+    int j;
+    for (j=0; j<D; j++) {
+        destination[j] = source[j];
+    }
 }
 
 void print_population (double **population, int NP, int D) {
