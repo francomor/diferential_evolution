@@ -1,5 +1,5 @@
 /* 
- * This implements the NPE/rand/1/bin optimization algorithm for minimization problems.
+ * This implements the NPE/rand/1/bin optimization algorithm for FJSSP problem.
  *
  */
 #include <stdlib.h>
@@ -17,7 +17,7 @@
 
 
 int convert_string_argv_to_int (char** argv, int position);
-void run_diferential_evolution_for_fjssp (char *filename, int max_generations, int NP, float F, float CR);
+void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int max_generations, int NP, float F, float CR);
 double** init_matrix (int number_rows, int number_columns);
 void free_matrix (double **matrix, int number_rows);
 void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value);
@@ -25,20 +25,23 @@ double** init_matrix_with_value (int number_rows, int number_columns, double val
 double* init_array (int size);
 double* init_array_with_value (int size, double value);
 void set_all_array_values_to (double *array, int size, double value);
-void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int **job_id_x_operation_id, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
-void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int **job_id_x_operation_id, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
-void mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR);
+void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
+void DE_mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
+void DE_mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR);
 void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, int D);
 void copy_population (double **source, double **destination, int NP, int D);
 void copy_individual (double *source, double *destination, int D);
-double this_evaluate (double *individual, int D, int **job_data, int **job_id_x_operation_id, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
+double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
 void print_population (double **population, int NP, int D);
 double best_fitness_of_population (double *individuals_fitness, int NP);
 int* init_int_array (int size);
 int* decode_solution (double *individual, int D, int *number_operations_per_job, int number_of_jobs);
+int* init_permutation_vector_for_individual (double *individual, int D);
+void change_permutation_vector_to_permutation_with_repetitions (int *permutation_vector, int D, int *number_operations_per_job, int number_of_jobs);
 void swap_double (double *a, double *b);
 void swap_int (int *a, int *b);
 void bubbleSort (double *array, int *id_array, int n);
+
 
 //#define F 0.9
 //#define CR 0.1
@@ -47,10 +50,10 @@ void bubbleSort (double *array, int *id_array, int n);
 long int total_eval; //need for evaluate.h, i don't use
 int main (int argc, char **argv) {
     int max_generations, NP;
-    char *filename;
+    char *filename_of_FJSSP_instance;
     float F, CR;
     if (argc == 6) {
-        filename = argv[1];
+        filename_of_FJSSP_instance = argv[1];
         NP = convert_string_argv_to_int (argv, 2);
         max_generations = convert_string_argv_to_int (argv, 3);
         F =  (convert_string_argv_to_int (argv, 4) / 100.0);
@@ -63,7 +66,7 @@ int main (int argc, char **argv) {
 
     //rand48 is uniform[0,1]
     srand48(time(NULL));
-    run_diferential_evolution_for_fjssp (filename, max_generations, NP, F, CR);
+    run_diferential_evolution_for_fjssp (filename_of_FJSSP_instance, max_generations, NP, F, CR);
 }
 
 int convert_string_argv_to_int (char** argv, int position) {
@@ -84,82 +87,47 @@ int convert_string_argv_to_int (char** argv, int position) {
     return num;
 }
 
-void run_diferential_evolution_for_fjssp (char *filename, int max_generations, int NP, float F, float CR) {
+void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int max_generations, int NP, float F, float CR) {
     int D;
     int **job_data, **job_id_x_operation_id;
     int *number_operations_per_job;
     int number_of_machines, number_of_jobs, number_of_operations = 0;
-    time_t time_DE = time (NULL);
+    time_t total_running_time = time (NULL);
     time_t time_of_best_global_fitness = time (NULL);
-    readInstanceFJJ (filename, &job_data, &number_of_machines, &number_of_jobs, &number_operations_per_job, &job_id_x_operation_id, &number_of_operations);
+    readInstanceFJJ (filename_of_FJSSP_instance, &job_data, &number_of_machines, &number_of_jobs, &number_operations_per_job, &job_id_x_operation_id, &number_of_operations);
     D = number_of_operations;
 
-    int count = 0, generation_of_best_fitness = 0;
+    int i, generation_of_best_fitness = 0;
     double **population = init_matrix (NP, D);
     double *individuals_fitness = init_array (NP);
     double *lower_bound = init_array_with_value (D, -1);
     double *upper_bound = init_array_with_value (D, 1);
     double best_global_fitness = DBL_MAX, this_population_best_fitness;
 
-    initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D, job_data, job_id_x_operation_id, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
-    // printf("number_of_jobs: %d\n", number_of_jobs);
-    // printf("number_of_machines: %d\n", number_of_machines);
-    // printf("number_of_operations: %d\n", number_of_operations);
-    // printf("job_data\n");
-    //     int row, columns;
-    //     for (row=0; row<number_of_operations; row++) {
-    //         for (columns=0; columns<number_of_machines; columns++) {
-    //             printf("%d     ", job_data[row][columns]);
-    // //decode_solution (population[row], D);
-    //         }
-    //         printf("\n");
-    //     }
-    // printf("job_id_x_operation_id\n");
-    //     for (row=0; row<number_of_operations; row++) {
-    //         for (columns=0; columns<2; columns++) {
-    //             printf("%d     ", job_id_x_operation_id[row][columns]);
-    // //decode_solution (population[row], D);
-    //         }
-    //         printf("\n");
-    //     }
-
-    // //imprimir operation_id
-    //     printf("\n");
-    // printf("number_operations_per_job\n");
-    // int i;
-    // for (i=0; i<number_of_jobs; i++) {
-    //     printf("%d     ", number_operations_per_job[i]);
-    // }
-    // printf("\n");
-
-    
-
+    initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
     // printf("population inicial");
     // print_population (population, NP, D);
     // printf("\n");
 
     /* Halt after max_generations generations. */
-    while (count < max_generations) { 
-        mutate_recombine_evaluate_and_select (population, individuals_fitness, NP, D, F, CR, job_data, job_id_x_operation_id, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
-
+    i = 0;
+    while (i < max_generations) { 
+        DE_mutate_recombine_evaluate_and_select (population, individuals_fitness, NP, D, F, CR, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
 
         this_population_best_fitness = best_fitness_of_population (individuals_fitness, NP);
-        //printf("this_population_best_fitness: %f \n", this_population_best_fitness);
-        //printf("best_global_fitness: %f \n", best_global_fitness);
-
         if (this_population_best_fitness < best_global_fitness) {
             best_global_fitness = this_population_best_fitness;
-            generation_of_best_fitness = count;
-            time_of_best_global_fitness = time (NULL) - time_DE;
+            generation_of_best_fitness = i;
+            time_of_best_global_fitness = time (NULL) - total_running_time;
         }
-        count++;
+        i++;
     }
 
     // printf("population final");
     // print_population (population, NP, D);
 
-    //printf("Mejor fitness %f encontrado en la generacion %d\n", best_global_fitness, generation_of_best_fitness);
-    time_DE = time (NULL) - time_DE;
+    total_running_time = time (NULL) - total_running_time;
+    
     cout << D << " ";
     cout << NP << " ";
     cout << F << " ";
@@ -167,7 +135,8 @@ void run_diferential_evolution_for_fjssp (char *filename, int max_generations, i
     cout << max_generations << " ";
     cout << best_global_fitness << " ";
     cout << generation_of_best_fitness << " ";
-    cout << time_DE << " \n";
+    cout << total_running_time << " \n";
+    
     free_matrix (population, NP);
     free (individuals_fitness);
     individuals_fitness = NULL;
@@ -235,18 +204,18 @@ void set_all_array_values_to (double *array, int size, double value) {
     }
 }
 
-void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int **job_id_x_operation_id, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
+void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
     int i, j;
     for (i=0; i<NP; i++) {
         for (j=0; j<D; j++) {
             population[i][j] = lower_bound[j] + drand48() * (upper_bound[j] - lower_bound[j]);
         }
-        individuals_fitness[i] = this_evaluate(population[i], D, job_data, job_id_x_operation_id, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+        individuals_fitness[i] = DE_evaluate (population[i], D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
     }
 }
 
-void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int **job_id_x_operation_id, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
-    //trial populations is used as nex population in select
+void DE_mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
+    //trial populations is used as next population in select
     double **trial_population = init_matrix_with_value (NP, D, 0);
     double *trials_fitness = init_array (NP);
     int i;
@@ -255,11 +224,10 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
     omp_set_num_threads(3);
     #pragma omp parallel
     {
-        //printf("%d\n", omp_get_thread_num());
         #pragma omp for
         for (i=0; i<NP; i++) {
-            mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
-            trials_fitness[i] = this_evaluate (trial_population[i], D, job_data, job_id_x_operation_id, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+            DE_mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
+            trials_fitness[i] = DE_evaluate (trial_population[i], D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
         }
     }
     for (i=0; i<NP; i++) {
@@ -274,7 +242,7 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
     trials_fitness = NULL;
 }
 
-void mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR) {
+void DE_mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR) {
     int a, b, c, k, j;
     /* Randomly pick 3 vectors, all different from individual_index */ 
     do a = drand48() * NP; while (a == individual_index); 
@@ -318,7 +286,8 @@ void copy_individual (double *source, double *destination, int D) {
     }
 }
 
-double this_evaluate (double *individual, int D, int **job_data, int **job_id_x_operation_id, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
+double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
+    //current_fitness and evaluation_up_to_date are necessary for evaluate from standard
     double fitness, current_fitness = 0;
     int evaluation_up_to_date = 1;
     Solution *solution = new Solution;
@@ -363,32 +332,37 @@ int* init_int_array (int size) {
 }
 
 int* decode_solution (double *individual, int D, int *number_operations_per_job, int number_of_jobs) {
-    int *operation_id = init_int_array (D); 
+    int *solution = init_permutation_vector_for_individual (individual, D); 
+    change_permutation_vector_to_permutation_with_repetitions (solution, D, number_operations_per_job, number_of_jobs);
+    return solution;
+}
+
+int* init_permutation_vector_for_individual (double *individual, int D) {
+    int *permutation_vector = init_int_array (D); 
+    double *individual_for_work = init_array (D);
     int i;
     for (i=0; i<D; i++) {
-        operation_id[i] = i + 1;
+        permutation_vector[i] = i + 1;
     }
-
-    double *individual_for_work = init_array (D);
     copy_individual (individual, individual_for_work, D);
-    bubbleSort (individual_for_work, operation_id, D);
+    bubbleSort (individual_for_work, permutation_vector, D);
+    
     free (individual_for_work);
     individual_for_work = NULL;
+    return permutation_vector;
+}
 
-    int operation_lower_bound = 0, operation_upper_bound, j;
+void change_permutation_vector_to_permutation_with_repetitions (int *permutation_vector, int D, int *number_operations_per_job, int number_of_jobs) {
+    int operation_lower_bound = 0, operation_upper_bound, i, j;
     for (i=0; i<number_of_jobs; i++) {
-        //printf("operation_lower_bound: %d\n\n", operation_lower_bound);
         operation_upper_bound = number_operations_per_job[i] + operation_lower_bound;
-        //printf("operation_upper_bound: %d\n\n", operation_upper_bound);
         for (j=0; j<D; j++) {
-            if(operation_lower_bound <= operation_id[j] && operation_id[j] <= operation_upper_bound) {
-                operation_id[j] = i + 1;
+            if(operation_lower_bound <= permutation_vector[j] && permutation_vector[j] <= operation_upper_bound) {
+                permutation_vector[j] = i + 1;
             }
         }
         operation_lower_bound = number_operations_per_job[i] + operation_lower_bound;
     }
-
-    return operation_id;
 }
 
 void swap_double (double *a, double *b) { 
