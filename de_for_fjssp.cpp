@@ -19,7 +19,7 @@
 
 
 int convert_string_argv_to_int (char** argv, int position);
-void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int max_generations, int NP, float F, float CR);
+void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int NP, float F, float CR);
 double** init_matrix (int number_rows, int number_columns);
 void free_matrix (double **matrix, int number_rows);
 void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value);
@@ -51,24 +51,23 @@ void bubbleSort (double *array, int *id_array, int n);
 //#define NP 10
 long int total_eval; //need for evaluate.h, i don't use
 int main (int argc, char **argv) {
-    int max_generations, NP;
+    int NP;
     char *filename_of_FJSSP_instance;
     float F, CR;
-    if (argc == 6) {
+    if (argc == 5) {
         filename_of_FJSSP_instance = argv[1];
         NP = convert_string_argv_to_int (argv, 2);
-        max_generations = convert_string_argv_to_int (argv, 3);
-        F =  (convert_string_argv_to_int (argv, 4) / 100.0);
-        CR = (convert_string_argv_to_int (argv, 5) / 100.0);
+        F = (convert_string_argv_to_int (argv, 3) / 100.0);
+        CR = (convert_string_argv_to_int (argv, 4) / 100.0);
     }
     else {
-        printf ("usar: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
+        printf ("usar: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100)");
         exit (1);
     }
 
     //rand48 is uniform[0,1]
     srand48(time(NULL));
-    run_diferential_evolution_for_fjssp (filename_of_FJSSP_instance, max_generations, NP, F, CR);
+    run_diferential_evolution_for_fjssp (filename_of_FJSSP_instance, NP, F, CR);
 }
 
 int convert_string_argv_to_int (char** argv, int position) {
@@ -80,8 +79,8 @@ int convert_string_argv_to_int (char** argv, int position) {
     // Check for errors: e.g., the string does not represent an integer
     // or the integer is larger than int
     if (errno != 0 || *p != '\0' || conv > INT_MAX) {
-        printf ("usar: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
-        printf ("usar: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
+        printf ("usar: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100)");
+        printf ("usar: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100)");
         exit (1);
     } else {
         num = conv;    
@@ -89,17 +88,18 @@ int convert_string_argv_to_int (char** argv, int position) {
     return num;
 }
 
-void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int max_generations, int NP, float F, float CR) {
+void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int NP, float F, float CR) {
     int D;
     int **job_data, **job_id_x_operation_id;
     int *number_operations_per_job;
     int number_of_machines, number_of_jobs, number_of_operations = 0;
-    time_t total_running_time = time (NULL);
-    time_t time_of_best_global_fitness = time (NULL);
+    time_t initial_time = time (NULL), time_of_best_global_fitness = time (NULL);
+    time_t total_time, t_ini = time(NULL);
     readInstanceFJJ (filename_of_FJSSP_instance, &job_data, &number_of_machines, &number_of_jobs, &number_operations_per_job, &job_id_x_operation_id, &number_of_operations);
     D = number_of_operations;
+    double final_time = number_of_operations * (number_of_operations / 2) * 30;
 
-    int i, generation_of_best_fitness = 0;
+    int total_iter, generation_of_best_fitness = 0;
     double **population = init_matrix (NP, D);
     double *individuals_fitness = init_array (NP);
     double *lower_bound = init_array_with_value (D, -1);
@@ -110,33 +110,33 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     // printf("population inicial");
     // print_population (population, NP, D);
     // printf("\n");
-
-    /* Halt after max_generations generations. */
-    i = 0;
-    while (i < max_generations) { 
+    total_iter = 0;
+    do {
         DE_mutate_recombine_evaluate_and_select (population, individuals_fitness, NP, D, F, CR, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
 
         this_population_best_fitness = best_fitness_of_population (individuals_fitness, NP);
         if (this_population_best_fitness < best_global_fitness) {
             best_global_fitness = this_population_best_fitness;
-            generation_of_best_fitness = i;
-            time_of_best_global_fitness = time (NULL) - total_running_time;
+            generation_of_best_fitness = total_iter;
+            time_of_best_global_fitness = time (NULL) - initial_time;
         }
-        i++;
-    }
+        total_iter ++;
+        total_time = (time(NULL) - t_ini) * 1000;
+    } while ((total_time < final_time)); //milisegundos   
 
     // printf("population final");
     // print_population (population, NP, D);
 
-    total_running_time = time (NULL) - total_running_time;
+    time_t total_running_time = time (NULL) - initial_time;
     
     cout << D << " ";
     cout << NP << " ";
     cout << F << " ";
     cout << CR << " ";
-    cout << max_generations << " ";
+    cout << total_iter << " ";
     cout << best_global_fitness << " ";
     cout << generation_of_best_fitness << " ";
+    cout << time_of_best_global_fitness << " ";
     cout << total_running_time << " \n";
     
     free_matrix (population, NP);
