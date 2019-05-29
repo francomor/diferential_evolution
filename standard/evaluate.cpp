@@ -92,7 +92,13 @@ double evaluate(Solution& sol, double &costo, int M, int J,int Op, int * N_Ope_j
 	for(int t=0;t<J;t++)
 		if(tiempojob[t]>= m) m=tiempojob[t];
 	
-	delete Sm ;
+	delete[] Sm ;
+
+	//FIX USO DE MEMORIA FRANCO MORERO
+	delete[] maq;
+	delete[] ctajob;
+	delete[] tpojob;
+
 	//cout<<"evalua original "<<m<<endl;
 	total_eval++;
 	return m;

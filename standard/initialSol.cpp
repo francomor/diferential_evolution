@@ -41,7 +41,7 @@ int aux,aux2;
 //***********************************************************************
 void initializeKacem(Solution& sol, int J, int M, int *N_Ope_job, int Op, int **JobData, int&act) 		
 {
-int aux,aux2,aux3,auxm;
+	int aux;
 //creo una cola por Job y cargo las operaciones
 //cout<<"inicio kacem J="<<J<<endl;	
 	queue<int> c[J]; 
@@ -66,7 +66,7 @@ int aux,aux2,aux3,auxm;
 
 void initializeKacem1(Solution& sol, int J, int M, int *N_Ope_job, int Op, int **JobData, int&act) 		//version sin cola--Gaby 10/5/2016
 {
-int aux,aux2,aux3,auxm;
+	int aux;
 //creo una cola por Job y cargo las operaciones
 //cout<<"inicio kacem J="<<J<<endl;	
 	int *c = new int[J]; 
@@ -86,7 +86,7 @@ int aux,aux2,aux3,auxm;
 	}
 	act=1;
 
-	delete c;	
+	delete[] c;	
 	return;
 }
 
@@ -128,10 +128,10 @@ int aux,aux2,auxm;
 */
 //devuelve la posicion de operacion para un job y su operacion
 int Job_Op_a_Op(int J, int O ,int *N_Ope_job){
-int o=0;
-for(int i=0;i<J;i++)
-	o+=N_Ope_job[i];
-return o+O;
+	int o=0;
+	for(int i=0;i<J;i++)
+		o+=N_Ope_job[i];
+	return o+O;
 }
 
 

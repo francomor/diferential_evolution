@@ -14,7 +14,6 @@
 
 int readInstanceFJJ(char * filename, int *** JobData, int *M, int *J, int ** N_Ope_job, int *** op_to_JobOp,int *Op)
 {
-	char aux;
 	float auxN;
 
 	ifstream file(filename);
