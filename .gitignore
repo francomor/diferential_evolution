@@ -52,5 +52,5 @@ Mkfile.old
 dkms.conf
 
 # DE
-salida.txt
+*.txt
 *.fjs

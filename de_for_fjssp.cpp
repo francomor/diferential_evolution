@@ -43,7 +43,7 @@ void change_permutation_vector_to_permutation_with_repetitions (int *permutation
 void swap_double (double *a, double *b);
 void swap_int (int *a, int *b);
 void bubbleSort (double *array, int *id_array, int n);
-
+int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
 
 //#define F 0.9
 //#define CR 0.1
@@ -89,7 +89,7 @@ int convert_string_argv_to_int (char** argv, int position) {
 }
 
 void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int NP, float F, float CR) {
-    int D;
+    int D, total_of_evaluation_in_local_search = 0;
     int **job_data, **job_id_x_operation_id;
     int *number_operations_per_job;
     int number_of_machines, number_of_jobs, number_of_operations = 0;
@@ -120,6 +120,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
             generation_of_best_fitness = total_iter;
             time_of_best_global_fitness = time (NULL) - initial_time;
         }
+        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_local_search (population, NP, D, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
         total_iter ++;
         total_time = (time(NULL) - t_ini) * 1000;
     } while ((total_time < final_time)); //milisegundos   
@@ -137,7 +138,8 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     cout << best_global_fitness << " ";
     cout << generation_of_best_fitness << " ";
     cout << time_of_best_global_fitness << " ";
-    cout << total_running_time << " \n";
+    cout << total_running_time << " ";
+    cout << total_of_evaluation_in_local_search << " \n";
     
     free_matrix (population, NP);
     free (individuals_fitness);
@@ -396,4 +398,29 @@ void bubbleSort (double *array, int *id_array, int n) {
         if (swapped == false) 
             break; 
     } 
-} 
+}
+
+int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations){
+    int i, number_of_evaluations_done = 0;
+    int lower_bound, upper_bound, index1, index2;
+    double *trial_individual = init_array (D);
+    double trial_fitness;
+    lower_bound = 0;
+    upper_bound = D - 1;
+    for (i=0; i<NP; i++){
+        if (drand48() < 0.5){
+            index1 = lower_bound + drand48() * (upper_bound - lower_bound);
+            index2 = lower_bound + drand48() * (upper_bound - lower_bound);
+            copy_individual (population[i], trial_individual, D);
+            swap_double (&trial_individual[index1], &trial_individual[index2]);
+            trial_fitness = DE_evaluate (trial_individual, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+            number_of_evaluations_done ++;
+            if (trial_fitness <= individuals_fitness[i]) {
+                copy_individual (trial_individual, population[i], D);
+                individuals_fitness[i] = trial_fitness;
+            }
+        }
+    }
+    free (trial_individual);
+    return number_of_evaluations_done;
+}
