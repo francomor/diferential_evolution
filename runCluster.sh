@@ -321,3 +321,38 @@ do
 	./de_for_fjssp.out Mk09.fjs 100 90 90 >> salida.txt
 	sleep .3
 done
+
+echo "Mk10 10 90 10" >> salida.txt
+for (( counter=0; counter<30; counter++ ))
+do
+	./de_for_fjssp.out Mk10.fjs 10 90 10 >> salida.txt
+	sleep .3
+done
+
+echo "Mk10 50 90 10" >> salida.txt
+for (( counter=0; counter<30; counter++ ))
+do
+	./de_for_fjssp.out Mk10.fjs 50 90 10 >> salida.txt
+	sleep .3
+done
+
+echo "Mk10 100 90 10" >> salida.txt
+for (( counter=0; counter<30; counter++ ))
+do
+	./de_for_fjssp.out Mk10.fjs 100 90 10 >> salida.txt
+	sleep .3
+done
+
+echo "Mk10 50 90 90" >> salida.txt
+for (( counter=0; counter<30; counter++ ))
+do
+	./de_for_fjssp.out Mk10.fjs 50 90 90 >> salida.txt
+	sleep .3
+done
+
+echo "Mk10 100 90 90" >> salida.txt
+for (( counter=0; counter<30; counter++ ))
+do
+	./de_for_fjssp.out Mk10.fjs 100 90 90 >> salida.txt
+	sleep .3
+done
