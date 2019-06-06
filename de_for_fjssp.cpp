@@ -35,7 +35,7 @@ double DE_evaluate (double *individual, int D, int **job_data, int *number_opera
 void copy_population (double **source, double **destination, int NP, int D);
 void copy_individual (double *source, double *destination, int D);
 void print_population (double **population, int NP, int D);
-double best_fitness_of_population (double *individuals_fitness, int NP);
+double best_fitness_of_population (double **population, double *individuals_fitness, int NP, double *best_individual, int D);
 int* init_int_array (int size);
 int* decode_solution (double *individual, int D, int *number_operations_per_job, int number_of_jobs);
 int* init_permutation_vector_for_individual (double *individual, int D);
@@ -109,6 +109,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     double *individuals_fitness = init_array (NP);
     double *lower_bound = init_array_with_value (D, -1);
     double *upper_bound = init_array_with_value (D, 1);
+    double *best_individual = init_array (D);
     double best_global_fitness = DBL_MAX, this_population_best_fitness;
 
     initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
@@ -119,7 +120,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     do {
         DE_mutate_recombine_evaluate_and_select (population, individuals_fitness, NP, D, F, CR, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
 
-        this_population_best_fitness = best_fitness_of_population (individuals_fitness, NP);
+        this_population_best_fitness = best_fitness_of_population (population, individuals_fitness, NP, best_individual, D);
         if (this_population_best_fitness < best_global_fitness) {
             best_global_fitness = this_population_best_fitness;
             generation_of_best_fitness = total_iter;
@@ -142,11 +143,17 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     cout << PLS << " ";
     cout << total_iter << " ";
     cout << best_global_fitness << " ";
-    //IMPRIMIR EL INVIVIDUO MEJOR
     cout << generation_of_best_fitness << " ";
     cout << time_of_best_global_fitness << " ";
     cout << total_running_time << " ";
-    cout << total_of_evaluation_in_local_search << " \n";
+    cout << total_of_evaluation_in_local_search << " ";
+    //IMPRIMIR EL INVIVIDUO MEJOR
+    int *best_individual_decode = decode_solution (best_individual, D, number_operations_per_job, number_of_jobs);
+    cout << "[";
+    for (int i=0; i<D; i++) {
+        cout << best_individual_decode[i] << ",";
+    }
+    cout << "]" << " \n";
     
     free_matrix (population, NP);
     free (individuals_fitness);
@@ -321,12 +328,13 @@ void print_population (double **population, int NP, int D) {
     }
 }
 
-double best_fitness_of_population (double *individuals_fitness, int NP) {
+double best_fitness_of_population (double **population, double *individuals_fitness, int NP, double *best_individual, int D) {
     double best_fitness = DBL_MAX;
     int i;
     for (i=0; i<NP; i++) {
         if (individuals_fitness[i] < best_fitness) {
             best_fitness = individuals_fitness[i];
+            copy_individual (population[i], best_individual, D);
         }
     }
     return best_fitness;
@@ -409,8 +417,6 @@ void bubbleSort (double *array, int *id_array, int n) {
 int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
     int i, number_of_evaluations_done = 0;
     int lower_bound, upper_bound, index1, index2;
-    double *trial_individual = init_array (D);
-    double trial_fitness;
     lower_bound = 0;
     upper_bound = D - 1;
     #pragma omp parallel
@@ -425,7 +431,6 @@ int run_local_search (double **population, int NP, int D, double *individuals_fi
             }
         }
     }
-    free (trial_individual);
     return number_of_evaluations_done;
 }
 
