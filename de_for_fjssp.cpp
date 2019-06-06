@@ -158,6 +158,10 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     free_matrix (population, NP);
     free (individuals_fitness);
     individuals_fitness = NULL;
+    free (best_individual);
+    best_individual = NULL;
+    free (best_individual_decode);
+    best_individual_decode = NULL;
     free (lower_bound);
     lower_bound = NULL;
     free (upper_bound);
