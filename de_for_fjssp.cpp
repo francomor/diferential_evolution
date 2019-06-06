@@ -27,11 +27,11 @@ double** init_matrix_with_value (int number_rows, int number_columns, double val
 double* init_array (int size);
 double* init_array_with_value (int size, double value);
 void set_all_array_values_to (double *array, int size, double value);
-void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
-void DE_mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
+void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
+void DE_mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
 void DE_mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR);
 void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, int D);
-double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
+double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
 void copy_population (double **source, double **destination, int NP, int D);
 void copy_individual (double *source, double *destination, int D);
 void print_population (double **population, int NP, int D);
@@ -43,25 +43,29 @@ void change_permutation_vector_to_permutation_with_repetitions (int *permutation
 void swap_double (double *a, double *b);
 void swap_int (int *a, int *b);
 void bubbleSort (double *array, int *id_array, int n);
-int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations);
+int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
+int run_aggressive_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
+bool LS_evaluate_and_select (double *individual, int D, double *fitness_of_individual, int index1, int index2, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
 
 //#define F 0.9
 //#define CR 0.1
 //#define D 10
 //#define NP 10
+double PLS = 0.5; //probability of local search
 long int total_eval; //need for evaluate.h, i don't use
 int main (int argc, char **argv) {
     int NP;
     char *filename_of_FJSSP_instance;
     float F, CR;
-    if (argc == 5) {
+    if (argc == 6) {
         filename_of_FJSSP_instance = argv[1];
         NP = convert_string_argv_to_int (argv, 2);
         F = (convert_string_argv_to_int (argv, 3) / 100.0);
         CR = (convert_string_argv_to_int (argv, 4) / 100.0);
+        PLS = (convert_string_argv_to_int (argv, 5) / 100.0);
     }
     else {
-        printf ("usar: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100)");
+        printf ("usar: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100) PLS(*100)");
         exit (1);
     }
 
@@ -106,13 +110,13 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     double *upper_bound = init_array_with_value (D, 1);
     double best_global_fitness = DBL_MAX, this_population_best_fitness;
 
-    initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+    initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
     // printf("population inicial");
     // print_population (population, NP, D);
     // printf("\n");
     total_iter = 0;
     do {
-        DE_mutate_recombine_evaluate_and_select (population, individuals_fitness, NP, D, F, CR, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+        DE_mutate_recombine_evaluate_and_select (population, individuals_fitness, NP, D, F, CR, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
 
         this_population_best_fitness = best_fitness_of_population (individuals_fitness, NP);
         if (this_population_best_fitness < best_global_fitness) {
@@ -120,7 +124,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
             generation_of_best_fitness = total_iter;
             time_of_best_global_fitness = time (NULL) - initial_time;
         }
-        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_local_search (population, NP, D, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_aggressive_local_search (population, NP, D, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
         total_iter ++;
         total_time = (time(NULL) - t_ini) * 1000;
     } while ((total_time < final_time)); //milisegundos   
@@ -134,8 +138,10 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     cout << NP << " ";
     cout << F << " ";
     cout << CR << " ";
+    cout << PLS << " ";
     cout << total_iter << " ";
     cout << best_global_fitness << " ";
+    //IMPRIMIR EL INVIVIDUO MEJOR
     cout << generation_of_best_fitness << " ";
     cout << time_of_best_global_fitness << " ";
     cout << total_running_time << " ";
@@ -208,17 +214,17 @@ void set_all_array_values_to (double *array, int size, double value) {
     }
 }
 
-void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
+void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
     int i, j;
     for (i=0; i<NP; i++) {
         for (j=0; j<D; j++) {
             population[i][j] = lower_bound[j] + drand48() * (upper_bound[j] - lower_bound[j]);
         }
-        individuals_fitness[i] = DE_evaluate (population[i], D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+        individuals_fitness[i] = DE_evaluate (population[i], D, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
     }
 }
 
-void DE_mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
+void DE_mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
     //trial populations is used as next population in select
     double **trial_population = init_matrix_with_value (NP, D, 0);
     double *trials_fitness = init_array (NP);
@@ -231,7 +237,7 @@ void DE_mutate_recombine_evaluate_and_select (double **population, double *indiv
         #pragma omp for
         for (i=0; i<NP; i++) {
             DE_mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
-            trials_fitness[i] = DE_evaluate (trial_population[i], D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+            trials_fitness[i] = DE_evaluate (trial_population[i], D, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
         }
     }
     for (i=0; i<NP; i++) {
@@ -276,14 +282,14 @@ void DE_select (double *individual, double *fitness_of_individual, double *trial
     }
 }
 
-double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations) {
+double DE_evaluate (double *individual, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
     //current_fitness and evaluation_up_to_date are necessary for evaluate from standard
     double fitness, current_fitness = 0;
     int evaluation_up_to_date = 1;
     Solution *solution = new Solution;
     solution->op = init_int_array (D); 
     solution->job = decode_solution (individual, D, number_operations_per_job, number_of_jobs);
-    fitness = evaluate(*solution, current_fitness , number_of_machines, number_of_jobs, number_of_operations, number_operations_per_job, job_data, evaluation_up_to_date);
+    fitness = evaluate(*solution, current_fitness , number_of_machines, number_of_jobs, D, number_operations_per_job, job_data, evaluation_up_to_date);
 
     free (solution->op);
     free (solution->job);
@@ -400,7 +406,7 @@ void bubbleSort (double *array, int *id_array, int n) {
     } 
 }
 
-int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int number_of_operations){
+int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
     int i, number_of_evaluations_done = 0;
     int lower_bound, upper_bound, index1, index2;
     double *trial_individual = init_array (D);
@@ -408,19 +414,56 @@ int run_local_search (double **population, int NP, int D, double *individuals_fi
     lower_bound = 0;
     upper_bound = D - 1;
     for (i=0; i<NP; i++){
-        if (drand48() < 0.5){
+        if (drand48() < PLS){
             index1 = lower_bound + drand48() * (upper_bound - lower_bound);
             index2 = lower_bound + drand48() * (upper_bound - lower_bound);
-            copy_individual (population[i], trial_individual, D);
-            swap_double (&trial_individual[index1], &trial_individual[index2]);
-            trial_fitness = DE_evaluate (trial_individual, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs, number_of_operations);
+            LS_evaluate_and_select (population[i], D, &individuals_fitness[i], index1, index2, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
             number_of_evaluations_done ++;
-            if (trial_fitness <= individuals_fitness[i]) {
-                copy_individual (trial_individual, population[i], D);
-                individuals_fitness[i] = trial_fitness;
-            }
         }
     }
     free (trial_individual);
     return number_of_evaluations_done;
+}
+
+int run_aggressive_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
+    int i, j, number_of_evaluations_done = 0;
+    int lower_bound, upper_bound, index1, index2;
+    bool finish_LS_for_this_individual;
+    lower_bound = 0;
+    upper_bound = D - 1;
+    for (i=0; i<NP; i++){
+        if (drand48() < PLS){
+            j = 0;
+            finish_LS_for_this_individual = false;
+            while (j<D && finish_LS_for_this_individual == false){
+                index1 = j;
+                do {
+                    index2 = lower_bound + drand48() * (upper_bound - lower_bound);
+                } while (index1 == index2);
+                finish_LS_for_this_individual = LS_evaluate_and_select (population[i], D, &individuals_fitness[i], index1, index2, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
+
+                number_of_evaluations_done ++;
+                j++;
+            }
+        }
+    }
+    return number_of_evaluations_done;
+}
+
+bool LS_evaluate_and_select (double *individual, int D, double *fitness_of_individual, int index1, int index2, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
+    double *trial_individual = init_array (D);
+    double trial_fitness;
+    bool is_beter_individual_find = false;
+
+    copy_individual (individual, trial_individual, D);
+    swap_double (&trial_individual[index1], &trial_individual[index2]);
+    trial_fitness = DE_evaluate (trial_individual, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
+    
+    if (trial_fitness <= *fitness_of_individual) {
+        copy_individual (trial_individual, individual, D);
+        *fitness_of_individual = trial_fitness;
+        is_beter_individual_find = true;
+    }
+    free (trial_individual);
+    return is_beter_individual_find;
 }

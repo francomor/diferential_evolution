@@ -19,7 +19,7 @@ all:
 	make DE
 
 runDE:
-	./de_for_fjssp.out Mk01.fjs 20 90 10
+	./de_for_fjssp.out Mk01.fjs 50 90 10 50
 
 runDE_valgrind:
-	valgrind --leak-check=yes ./de_for_fjssp.out Mk01.fjs 10 90 10
+	valgrind --leak-check=yes ./de_for_fjssp.out Mk01.fjs 50 90 10 50
