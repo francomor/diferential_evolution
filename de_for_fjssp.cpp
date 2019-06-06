@@ -71,6 +71,7 @@ int main (int argc, char **argv) {
 
     //rand48 is uniform[0,1]
     srand48(time(NULL));
+    omp_set_num_threads(3);
     run_diferential_evolution_for_fjssp (filename_of_FJSSP_instance, NP, F, CR);
 }
 
@@ -124,7 +125,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
             generation_of_best_fitness = total_iter;
             time_of_best_global_fitness = time (NULL) - initial_time;
         }
-        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_aggressive_local_search (population, NP, D, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
+        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_local_search (population, NP, D, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
         total_iter ++;
         total_time = (time(NULL) - t_ini) * 1000;
     } while ((total_time < final_time)); //milisegundos   
@@ -231,7 +232,6 @@ void DE_mutate_recombine_evaluate_and_select (double **population, double *indiv
     int i;
 
     /* Start loop through population. */
-    omp_set_num_threads(3);
     #pragma omp parallel
     {
         #pragma omp for
@@ -413,12 +413,16 @@ int run_local_search (double **population, int NP, int D, double *individuals_fi
     double trial_fitness;
     lower_bound = 0;
     upper_bound = D - 1;
-    for (i=0; i<NP; i++){
-        if (drand48() < PLS){
-            index1 = lower_bound + drand48() * (upper_bound - lower_bound);
-            index2 = lower_bound + drand48() * (upper_bound - lower_bound);
-            LS_evaluate_and_select (population[i], D, &individuals_fitness[i], index1, index2, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
-            number_of_evaluations_done ++;
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (i=0; i<NP; i++){
+            if (drand48() < PLS){
+                index1 = lower_bound + drand48() * (upper_bound - lower_bound);
+                index2 = lower_bound + drand48() * (upper_bound - lower_bound);
+                LS_evaluate_and_select (population[i], D, &individuals_fitness[i], index1, index2, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
+                number_of_evaluations_done ++;
+            }
         }
     }
     free (trial_individual);
@@ -431,19 +435,23 @@ int run_aggressive_local_search (double **population, int NP, int D, double *ind
     bool finish_LS_for_this_individual;
     lower_bound = 0;
     upper_bound = D - 1;
-    for (i=0; i<NP; i++){
-        if (drand48() < PLS){
-            j = 0;
-            finish_LS_for_this_individual = false;
-            while (j<D && finish_LS_for_this_individual == false){
-                index1 = j;
-                do {
-                    index2 = lower_bound + drand48() * (upper_bound - lower_bound);
-                } while (index1 == index2);
-                finish_LS_for_this_individual = LS_evaluate_and_select (population[i], D, &individuals_fitness[i], index1, index2, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (i=0; i<NP; i++){
+            if (drand48() < PLS){
+                j = 0;
+                finish_LS_for_this_individual = false;
+                while (j<D && finish_LS_for_this_individual == false){
+                    index1 = j;
+                    do {
+                        index2 = lower_bound + drand48() * (upper_bound - lower_bound);
+                    } while (index1 == index2);
+                    finish_LS_for_this_individual = LS_evaluate_and_select (population[i], D, &individuals_fitness[i], index1, index2, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
 
-                number_of_evaluations_done ++;
-                j++;
+                    number_of_evaluations_done ++;
+                    j++;
+                }
             }
         }
     }
