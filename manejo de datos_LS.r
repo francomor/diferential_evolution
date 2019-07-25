@@ -80,5 +80,12 @@ PLSs <- double(3)
   PLSs[1] <- min(datos1[["PLS"]])
   PLSs[2] <- min(datos2[["PLS"]])
   PLSs[3] <- min(datos3[["PLS"]])
-  datos_finales <- data.frame(Ds,NPs,Fs,CRs,PLSs,prom_total_iter,prom_best_global_fitness,prom_generation_of_best_fitness,prom_time_of_best_global_fitness,prom_total_running_time,prom_total_of_evaluation_in_local_search,min_best_global_fitness,ocurr_min_best_global_fitness)
+  
+desv_standar <- double(3)
+  desv_standar[1] <- sd(datos1[["best_global_fitness"]])
+  desv_standar[2] <- sd(datos2[["best_global_fitness"]])
+  desv_standar[3] <- sd(datos3[["best_global_fitness"]])
+  
+  
+datos_finales <- data.frame(Ds,NPs,Fs,CRs,PLSs,prom_total_iter,prom_best_global_fitness,desv_standar,prom_generation_of_best_fitness,prom_time_of_best_global_fitness,prom_total_running_time,prom_total_of_evaluation_in_local_search,min_best_global_fitness,ocurr_min_best_global_fitness)
 

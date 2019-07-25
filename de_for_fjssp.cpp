@@ -71,7 +71,7 @@ int main (int argc, char **argv) {
 
     //rand48 is uniform[0,1]
     srand48(time(NULL));
-    omp_set_num_threads(3);
+    omp_set_num_threads(4);
     run_diferential_evolution_for_fjssp (filename_of_FJSSP_instance, NP, F, CR);
 }
 
@@ -98,11 +98,10 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     int **job_data, **job_id_x_operation_id;
     int *number_operations_per_job;
     int number_of_machines, number_of_jobs, number_of_operations = 0;
-    time_t initial_time = time (NULL), time_of_best_global_fitness = time (NULL);
-    time_t total_time, t_ini = time(NULL);
+    
     readInstanceFJJ (filename_of_FJSSP_instance, &job_data, &number_of_machines, &number_of_jobs, &number_operations_per_job, &job_id_x_operation_id, &number_of_operations);
     D = number_of_operations;
-    double final_time = number_of_operations * (number_of_operations / 2) * 30;
+    double final_time = (number_of_operations * (number_of_operations / 2) * 30) / 4;
 
     int total_iter, generation_of_best_fitness = 0;
     double **population = init_matrix (NP, D);
@@ -111,6 +110,8 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     double *upper_bound = init_array_with_value (D, 1);
     double *best_individual = init_array (D);
     double best_global_fitness = DBL_MAX, this_population_best_fitness;
+    time_t initial_time = time (NULL), time_of_best_global_fitness = time (NULL);
+    time_t total_time, t_ini = time(NULL);
 
     initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
     // printf("population inicial");
@@ -126,6 +127,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
             generation_of_best_fitness = total_iter;
             time_of_best_global_fitness = time (NULL) - initial_time;
         }
+
         total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_local_search (population, NP, D, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
         total_iter ++;
         total_time = (time(NULL) - t_ini) * 1000;
