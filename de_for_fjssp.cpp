@@ -1,5 +1,6 @@
 /* 
- * This implements the NPE/rand/1/bin optimization algorithm for FJSSP problem.
+ * This implements and hybrid DE NPE/rand/1/bin optimization algorithm 
+ * with local search for FJSSP problem.
  *
  * Franco Morero
  * 2019
@@ -19,7 +20,7 @@
 
 
 int convert_string_argv_to_int (char** argv, int position);
-void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int NP, float F, float CR);
+void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int NP, float F, float CR, double PLS);
 double** init_matrix (int number_rows, int number_columns);
 void free_matrix (double **matrix, int number_rows);
 void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value);
@@ -43,20 +44,19 @@ void change_permutation_vector_to_permutation_with_repetitions (int *permutation
 void swap_double (double *a, double *b);
 void swap_int (int *a, int *b);
 void bubbleSort (double *array, int *id_array, int n);
-int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
-int run_aggressive_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
+int run_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
+int run_aggressive_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
 bool LS_evaluate_and_select (double *individual, int D, double *fitness_of_individual, int index1, int index2, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs);
 
-//#define F 0.9
-//#define CR 0.1
-//#define D 10
-//#define NP 10
-double PLS = 0.5; //probability of local search
+
+#define NUM_THREADS 4
+
 long int total_eval; //need for evaluate.h, i don't use
 int main (int argc, char **argv) {
     int NP;
     char *filename_of_FJSSP_instance;
     float F, CR;
+    double PLS; //probability of local search
     if (argc == 6) {
         filename_of_FJSSP_instance = argv[1];
         NP = convert_string_argv_to_int (argv, 2);
@@ -71,8 +71,8 @@ int main (int argc, char **argv) {
 
     //rand48 is uniform[0,1]
     srand48(time(NULL));
-    omp_set_num_threads(4);
-    run_diferential_evolution_for_fjssp (filename_of_FJSSP_instance, NP, F, CR);
+    omp_set_num_threads(NUM_THREADS);
+    run_diferential_evolution_for_fjssp (filename_of_FJSSP_instance, NP, F, CR, PLS);
 }
 
 int convert_string_argv_to_int (char** argv, int position) {
@@ -93,7 +93,7 @@ int convert_string_argv_to_int (char** argv, int position) {
     return num;
 }
 
-void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int NP, float F, float CR) {
+void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int NP, float F, float CR, double PLS) {
     int D, total_of_evaluation_in_local_search = 0;
     int **job_data, **job_id_x_operation_id;
     int *number_operations_per_job;
@@ -101,7 +101,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     
     readInstanceFJJ (filename_of_FJSSP_instance, &job_data, &number_of_machines, &number_of_jobs, &number_operations_per_job, &job_id_x_operation_id, &number_of_operations);
     D = number_of_operations;
-    double final_time = (number_of_operations * (number_of_operations / 2) * 30) / 4;
+    double final_time = (number_of_operations * (number_of_operations / 2) * 30) / NUM_THREADS;
 
     int total_iter, generation_of_best_fitness = 0;
     double **population = init_matrix (NP, D);
@@ -128,7 +128,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
             time_of_best_global_fitness = time (NULL) - initial_time;
         }
 
-        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_local_search (population, NP, D, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
+        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_local_search (population, NP, D, PLS, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs);
         total_iter ++;
         total_time = (time(NULL) - t_ini) * 1000;
     } while ((total_time < final_time)); //milisegundos   
@@ -149,7 +149,6 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     cout << time_of_best_global_fitness << " ";
     cout << total_running_time << " ";
     cout << total_of_evaluation_in_local_search << " ";
-    //IMPRIMIR EL INVIVIDUO MEJOR
     int *best_individual_decode = decode_solution (best_individual, D, number_operations_per_job, number_of_jobs);
     cout << "[";
     for (int i=0; i<D; i++) {
@@ -244,7 +243,6 @@ void DE_mutate_recombine_evaluate_and_select (double **population, double *indiv
     double *trials_fitness = init_array (NP);
     int i;
 
-    /* Start loop through population. */
     #pragma omp parallel
     {
         #pragma omp for
@@ -257,7 +255,6 @@ void DE_mutate_recombine_evaluate_and_select (double **population, double *indiv
         DE_select (population[i], &individuals_fitness[i], trial_population[i], &trials_fitness[i], D);
     }
         
-    /********** End of population loop; swap arrays **********/
     copy_population (trial_population, population, NP, D);
 
     free_matrix (trial_population, NP);
@@ -413,14 +410,12 @@ void bubbleSort (double *array, int *id_array, int n) {
                 swapped = true; 
             } 
         } 
-  
-        // IF no two elements were swapped by inner loop, then break 
         if (swapped == false) 
             break; 
     } 
 }
 
-int run_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
+int run_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
     int i, number_of_evaluations_done = 0;
     int lower_bound, upper_bound, index1, index2;
     lower_bound = 0;
@@ -440,7 +435,7 @@ int run_local_search (double **population, int NP, int D, double *individuals_fi
     return number_of_evaluations_done;
 }
 
-int run_aggressive_local_search (double **population, int NP, int D, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
+int run_aggressive_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs) {
     int i, j, number_of_evaluations_done = 0;
     int lower_bound, upper_bound, index1, index2;
     bool finish_LS_for_this_individual;

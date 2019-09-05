@@ -54,3 +54,4 @@ dkms.conf
 # DE
 *.txt
 *.fjs
+*.sh
