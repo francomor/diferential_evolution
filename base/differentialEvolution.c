@@ -13,35 +13,38 @@
 #include <omp.h>
 
 
-int convert_string_argv_to_int (char** argv, int position);
 void run_diferential_evolution (int max_generations, int D, int NP, float F, float CR);
-double** init_matrix (int number_rows, int number_columns);
-void free_matrix (double **matrix, int number_rows);
-void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value);
-double** init_matrix_with_value (int number_rows, int number_columns, double value);
-double* init_array (int size);
-double* init_array_with_value (int size, double value);
-void set_all_array_values_to (double *array, int size, double value);
 void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D);
 void mutate_recombine_evaluate_and_select (double **population, double *individuals_fitness, int NP, int D, float F, float CR);
 void mutate_and_recombine (double **population, int individual_index, double *trial_vector, int NP, int D, float F, float CR);
 void DE_select (double *individual, double *fitness_of_individual, double *trial_vector, double *fitness_of_trial_vector, int D);
-void copy_population (double **source, double **destination, int NP, int D);
-void copy_individual (double *source, double *destination, int D);
 double evaluate (double *individual, int D);
 double rosenbrock_function (double *individual, int D);
+void copy_population (double **source, double **destination, int NP, int D);
+void copy_individual (double *source, double *destination, int D);
 void print_population (double **population, int NP, int D);
 double best_fitness_of_population (double *individuals_fitness, int NP);
+double** init_matrix_with_value (int number_rows, int number_columns, double value);
+double** init_matrix (int number_rows, int number_columns);
+void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value);
+void free_matrix (double **matrix, int number_rows);
+double* init_array_with_value (int size, double value);
+double* init_array (int size);
+void set_all_array_values_to (double *array, int size, double value);
+int convert_string_argv_to_int (char** argv, int position);
 
 //#define F 0.9
 //#define CR 0.1
 //#define D 10
 //#define NP 10
+#define NUM_THREADS 4
+
 
 int main (int argc, char **argv) {
 	int max_generations;
 	int D, NP;
 	float F, CR;
+
 	if (argc == 6) {
 		D = convert_string_argv_to_int (argv, 1);
 		NP = convert_string_argv_to_int (argv, 2);
@@ -56,25 +59,8 @@ int main (int argc, char **argv) {
 
 	//rand48 is uniform[0,1]
 	srand48(time(NULL));
+	omp_set_num_threads(NUM_THREADS);
 	run_diferential_evolution (max_generations, D, NP, F, CR);
-}
-
-int convert_string_argv_to_int (char** argv, int position) {
-	char *p;
-	int num;
-	errno = 0;
-	long conv = strtol(argv[position], &p, 10);
-
-	// Check for errors: e.g., the string does not represent an integer
-	// or the integer is larger than int
-	if (errno != 0 || *p != '\0' || conv > INT_MAX) {
-	    printf ("usar: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
-	    printf ("usar: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
-		exit (1);
-	} else {
-	    num = conv;    
-	}
-	return num;
 }
 
 void run_diferential_evolution (int max_generations, int D, int NP, float F, float CR) {
@@ -87,18 +73,14 @@ void run_diferential_evolution (int max_generations, int D, int NP, float F, flo
 
 	initialize_individuals_randomly (population, lower_bound, upper_bound, individuals_fitness, NP, D);
 
-	//printf("population inicial");
+	//printf("init population");
 	//print_population (population, NP, D);
 	//printf("\n");
 
-	/* Halt after max_generations generations. */
 	while (count < max_generations) { 
 		mutate_recombine_evaluate_and_select (population, individuals_fitness, NP, D, F, CR);
 
 		this_population_best_fitness = best_fitness_of_population (individuals_fitness, NP);
-		//printf("this_population_best_fitness: %f \n", this_population_best_fitness);
-		//printf("best_global_fitness: %f \n", best_global_fitness);
-
 		if (this_population_best_fitness < best_global_fitness) {
 			best_global_fitness = this_population_best_fitness;
 			generation_of_best_fitness = count;
@@ -106,10 +88,9 @@ void run_diferential_evolution (int max_generations, int D, int NP, float F, flo
 		count++;
 	}
 
-	//printf("population final");
+	//printf("final population");
 	//print_population (population, NP, D);
 
-	//printf("Mejor fitness %f encontrado en la generacion %d\n", best_global_fitness, generation_of_best_fitness);
 	printf("%d %d %f %f %d %f %d\n", D, NP, F, CR, max_generations, best_global_fitness, generation_of_best_fitness);
 	
 	free_matrix (population, NP);
@@ -119,64 +100,6 @@ void run_diferential_evolution (int max_generations, int D, int NP, float F, flo
 	lower_bound = NULL;
 	free (upper_bound);
 	upper_bound = NULL;
-}
-
-double** init_matrix (int number_rows, int number_columns) {
-	double **matrix = (double **) malloc (number_rows * sizeof(double*));
-	int i, j;
-	if (matrix  == NULL) {
-		printf ("Problemas reservando memoria");
-		exit (1);
-	}
-	for (i=0; i<number_rows; i++) {
-    	matrix[i] = init_array (number_columns);
-	}
-	return matrix;
-}
-
-void free_matrix (double **matrix, int number_rows) {
-	int i;
-	for (i=0; i<number_rows; i++) {
-		free (matrix[i]);
-		matrix[i] = NULL;
-	}
-	free (matrix);
-	matrix = NULL;
-}
-
-void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value) {
-	int i;
-	for (i=0; i<number_rows; i++) {
-		set_all_array_values_to (matrix[i], number_columns, value);
-	}
-}
-
-double** init_matrix_with_value (int number_rows, int number_columns, double value) {
-	double **matrix = init_matrix (number_rows, number_columns);
-	set_all_matrix_values_to (matrix, number_rows, number_columns, value);
-	return matrix;
-}
-
-double* init_array (int size) {
-	double *array = (double *) malloc (size * sizeof(double));
-	if (array  == NULL) {
-		printf ("Problemas reservando memoria");
-		exit (1);
-	}
-	return array;
-}
-
-double* init_array_with_value (int size, double value) {
-	double *array = init_array (size);
-	set_all_array_values_to (array, size, value);
-	return array;
-}
-
-void set_all_array_values_to (double *array, int size, double value) {
-	int i;
-	for (i=0; i<size; i++) {
-		array[i] = value;
-	}
 }
 
 void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D) {
@@ -195,11 +118,8 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
 	double *trials_fitness = init_array (NP);
 	int i;
 
-	/* Start loop through population. */
-	omp_set_num_threads(3);
 	#pragma omp parallel
     {
-    	//printf("%d\n", omp_get_thread_num());
         #pragma omp for
 	    for (i=0; i<NP; i++) {
 	        mutate_and_recombine (population, i, trial_population[i], NP, D, F, CR);
@@ -209,8 +129,6 @@ void mutate_recombine_evaluate_and_select (double **population, double *individu
     for (i=0; i<NP; i++) {
         DE_select (population[i], &individuals_fitness[i], trial_population[i], &trials_fitness[i], D);
     }
-        
-    /********** End of population loop; swap arrays **********/
     copy_population (trial_population, population, NP, D);
 
 	free_matrix (trial_population, NP);
@@ -248,20 +166,6 @@ void DE_select (double *individual, double *fitness_of_individual, double *trial
     }
 }
 
-void copy_population (double **source, double **destination, int NP, int D) {
-	int i;
-    for (i=0; i<NP; i++) {
-        copy_individual (source[i], destination[i], D);
-    } 
-}
-
-void copy_individual (double *source, double *destination, int D) {
-    int j;
-    for (j=0; j<D; j++) {
-        destination[j] = source[j];
-    }
-}
-
 double evaluate (double *individual, int D) {
 	return rosenbrock_function (individual, D);
 }
@@ -279,6 +183,20 @@ double rosenbrock_function (double *individual, int D) {
 		fitness = fitness + (100.0 * ((x2 - x1 * x1) * (x2 - x1 * x1))) + (diff_x1 * diff_x1);
 	}
 	return fitness;
+}
+
+void copy_population (double **source, double **destination, int NP, int D) {
+	int i;
+    for (i=0; i<NP; i++) {
+        copy_individual (source[i], destination[i], D);
+    } 
+}
+
+void copy_individual (double *source, double *destination, int D) {
+    int j;
+    for (j=0; j<D; j++) {
+        destination[j] = source[j];
+    }
 }
 
 void print_population (double **population, int NP, int D) {
@@ -300,4 +218,77 @@ double best_fitness_of_population (double *individuals_fitness, int NP) {
 		}
 	}
 	return best_fitness;
+}
+
+double** init_matrix_with_value (int number_rows, int number_columns, double value) {
+	double **matrix = init_matrix (number_rows, number_columns);
+	set_all_matrix_values_to (matrix, number_rows, number_columns, value);
+	return matrix;
+}
+
+double** init_matrix (int number_rows, int number_columns) {
+	double **matrix = (double **) malloc (number_rows * sizeof(double*));
+	int i, j;
+	if (matrix  == NULL) {
+		printf ("Problemas reservando memoria");
+		exit (1);
+	}
+	for (i=0; i<number_rows; i++) {
+    	matrix[i] = init_array (number_columns);
+	}
+	return matrix;
+}
+
+void set_all_matrix_values_to (double **matrix, int number_rows, int number_columns, double value) {
+	int i;
+	for (i=0; i<number_rows; i++) {
+		set_all_array_values_to (matrix[i], number_columns, value);
+	}
+}
+
+void free_matrix (double **matrix, int number_rows) {
+	int i;
+	for (i=0; i<number_rows; i++) {
+		free (matrix[i]);
+		matrix[i] = NULL;
+	}
+	free (matrix);
+	matrix = NULL;
+}
+
+double* init_array_with_value (int size, double value) {
+	double *array = init_array (size);
+	set_all_array_values_to (array, size, value);
+	return array;
+}
+
+double* init_array (int size) {
+	double *array = (double *) malloc (size * sizeof(double));
+	if (array  == NULL) {
+		printf ("Problemas reservando memoria");
+		exit (1);
+	}
+	return array;
+}
+
+void set_all_array_values_to (double *array, int size, double value) {
+	int i;
+	for (i=0; i<size; i++) {
+		array[i] = value;
+	}
+}
+
+int convert_string_argv_to_int (char** argv, int position) {
+	char *p;
+	int num;
+	errno = 0;
+	long conv = strtol(argv[position], &p, 10);
+
+	if (errno != 0 || *p != '\0' || conv > INT_MAX) {
+	    printf ("usar: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
+		exit (1);
+	} else {
+	    num = conv;    
+	}
+	return num;
 }
