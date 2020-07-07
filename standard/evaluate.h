@@ -18,4 +18,5 @@ using namespace std;
 //LAS FUNCIONES DE MAXIMIZACIÓN DEVUELVEN EL COSTO 
 //double evaluate(int *Sjobs, int *Soperaciones, double &costo, int M, int J,int Op, int * N_Ope_job, int ** JobData);  
 double evaluate(Solution& sol, double &costo, int M, int J,int Op, int * N_Ope_job, int ** JobData, int &act);  
+double evaluate_with_machine_vector(Solution& sol, double &costo, int M, int J,int Op, int * N_Ope_job, int **JobData, int &act, int *Sm);
 #endif

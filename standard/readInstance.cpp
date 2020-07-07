@@ -90,20 +90,20 @@ int readInstanceFJJ(char * filename, int *** JobData, int *M, int *J, int ** N_O
 	}
 //----------------------------------------------
 //cout<<"despues parseo\n";
-/*
-//imprimo JobData-------------
-	cout<<"Jobs: "<<*J<<endl;
-	cout<<"Maquinas: "<<*M<<endl;
-	cout << "Operacione: "<<*Op <<endl;
-	cout << "J, O ";for(int i=0;i<*M;i++)cout << "\tM"<<i+1;
-	for(int i=0;i<*Op;++i){
-		cout <<endl<<(*op_to_JobOp)[i][0]<<", "<<(*op_to_JobOp)[i][1]<<":\t" ;
-		for(int j=0;j<*M;++j)
-			cout << (*JobData)[i][j]<< "\t";
-	}
-	cout <<endl;
-//----------------------------
-*/
+
+// //imprimo JobData-------------
+// 	cout<<"Jobs: "<<*J<<endl;
+// 	cout<<"Maquinas: "<<*M<<endl;
+// 	cout << "Operacione: "<<*Op <<endl;
+// 	cout << "J, O ";for(int i=0;i<*M;i++)cout << "\tM"<<i+1;
+// 	for(int i=0;i<*Op;++i){
+// 		cout <<endl<<(*op_to_JobOp)[i][0]<<", "<<(*op_to_JobOp)[i][1]<<":\t" ;
+// 		for(int j=0;j<*M;++j)
+// 			cout << (*JobData)[i][j]<< "\t";
+// 	}
+// 	cout <<endl;
+// //----------------------------
+
 	free(x);
 	return 1;
 }

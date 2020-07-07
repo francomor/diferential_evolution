@@ -1,5 +1,5 @@
 /*********************************************************************************
-* evalueate.cpp compendia las funciones de evaluación de soluciones		     *
+* evaluate.cpp compendia las funciones de evaluaciÃ³n de soluciones		     *
 * para distintos problemas    							     *
 * Gabriela Minetti - Carolina Salto									     *
 * Mayo de 2014									     *
@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include "evaluate.h"
 
-//LAS FUNCIONES DE MINIMIZACIÓN DEVUELVEN 1/COSTO
-//LAS FUNCIONES DE MAXIMIZACIÓN DEVUELVEN EL COSTO
+//LAS FUNCIONES DE MINIMIZACIÃ“N DEVUELVEN 1/COSTO
+//LAS FUNCIONES DE MAXIMIZACIÃ“N DEVUELVEN EL COSTO
 extern long int total_eval;
 double evaluate(Solution& sol, double &costo, int M, int J,int Op, int * N_Ope_job, int **JobData, int &act)  
 { 
@@ -104,3 +104,45 @@ double evaluate(Solution& sol, double &costo, int M, int J,int Op, int * N_Ope_j
 	return m;
 }
 
+
+double evaluate_with_machine_vector(Solution& sol, double &costo, int M, int J,int Op, int * N_Ope_job, int **JobData, int &act, int *Sm) { 	
+
+	int tiempojob[J];for(int t=0;t<J;++t)tiempojob[t]=0;	
+	int tiempomaq[M];for(int t=0;t<M;t++)tiempomaq[t]=0;			
+
+	if(act==0) return costo;	
+
+	int tiempo, m=0;	
+	//int *Sm =new int[Op]; //HABILITAR PARA LA OTRA FORMA DE EVALUACION	act=0;		
+	int *ctajob=new int[J]; 
+
+	for(int i=0;i<J;i++)
+		ctajob[i]=1; //lleva la cuenta de la operacion para cada job 	
+
+	for(int i=0;i<Op;i++) //armo vector operaciones		
+		sol.op[i]=ctajob[sol.job[i]-1]++;	
+
+				
+
+	for(int t=0;t<Op;t++){
+		//		cout << endl <<i<<": "<< Sj[i]<<", "<<So[i]<<" m->"<<Sm[i]<<" tiempo->"<< JobData [ Job_Op_a_Op( Sj[i]-1, So[i]-1, N_Ope_job ) ] [Sm[i]-1] <<endl;		
+		int fila=Job_Op_a_Op( sol.job[t]-1, sol.op[t]-1, N_Ope_job );		
+		tiempo=JobData [ fila ] [Sm[t]-1];		
+		if ( tiempojob[sol.job[t]-1] > tiempomaq[Sm[t]-1])			
+			tiempo+=tiempojob[sol.job[t]-1];					
+		else			
+			tiempo+=tiempomaq[Sm[t]-1];		
+		tiempojob[sol.job[t]-1]=tiempo;		
+		tiempomaq[Sm[t]-1]=tiempo;	
+	}	
+	m=0;
+	for(int t=0;t<J;t++)		
+		if(tiempojob[t]>= m) 
+			m=tiempojob[t];	
+
+	//FIX USO DE MEMORIA FRANCO MORERO	
+	delete[] ctajob;	
+	//cout<<"evalua original "<<m<<endl;	
+	total_eval++;	
+	return m;
+}
