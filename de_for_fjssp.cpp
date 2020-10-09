@@ -71,7 +71,7 @@ int main (int argc, char **argv) {
         PLS = (convert_string_argv_to_int (argv, 5) / 100.0);
     }
     else {
-        printf ("usar: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100) PLS(*100)");
+        printf ("use: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100) PLS(*100)");
         exit (1);
     }
 
@@ -483,7 +483,7 @@ double** init_matrix (int number_rows, int number_columns) {
     double **matrix = (double **) malloc (number_rows * sizeof(double*));
     int i;
     if (matrix  == NULL) {
-        printf ("Problemas reservando memoria");
+        printf ("Found problems in memory allocation");
         exit (1);
     }
     for (i=0; i<number_rows; i++) {
@@ -518,7 +518,7 @@ double* init_array_with_value (int size, double value) {
 double* init_array (int size) {
     double *array = (double *) malloc (size * sizeof(double));
     if (array  == NULL) {
-        printf ("Problemas reservando memoria");
+        printf ("Found problems in memory allocation");
         exit (1);
     }
     return array;
@@ -534,7 +534,7 @@ void set_all_array_values_to (double *array, int size, double value) {
 int* init_int_array (int size) {
     int *array = (int *) malloc (size * sizeof(int));
     if (array == NULL) {
-        printf ("Problemas reservando memoria");
+        printf ("Found problems in memory allocation");
         exit (1);
     }
     return array;
@@ -544,7 +544,7 @@ int** init_int_matrix (int number_rows, int number_columns) {
     int **matrix = (int **) malloc (number_rows * sizeof(int*));
     int i;
     if (matrix  == NULL) {
-        printf ("Problemas reservando memoria");
+        printf ("Found problems in memory allocation");
         exit (1);
     }
     for (i=0; i<number_rows; i++) {
@@ -572,7 +572,7 @@ int convert_string_argv_to_int (char** argv, int position) {
     // Check for errors: e.g., the string does not represent an integer
     // or the integer is larger than int
     if (errno != 0 || *p != '\0' || conv > INT_MAX) {
-        printf ("usar: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100)");
+        printf ("use: ./differentialEvolution.out filename_of_FJSSP_instance NP F(*100) CR(*100)");
         exit (1);
     } else {
         num = conv;    

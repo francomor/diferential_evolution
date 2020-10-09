@@ -285,7 +285,7 @@ int convert_string_argv_to_int (char** argv, int position) {
 	long conv = strtol(argv[position], &p, 10);
 
 	if (errno != 0 || *p != '\0' || conv > INT_MAX) {
-	    printf ("usar: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
+	    printf ("use: ./differentialEvolution.out D NP max_generations F(*100) CR(*100)");
 		exit (1);
 	} else {
 	    num = conv;    
