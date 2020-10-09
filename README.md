@@ -1,23 +1,24 @@
-# Algoritmo de evolucion diferencial
-DE/rand/1/bin para problema FJSSP
+# Diferential evolution algorithm to solve the FJSSP (Flexible Job Shop Scheduling Problem)
+This is a DE/rand/1/bin algoritm to solve the FJSSP, documented in this paper:
+[Parallelism and Hybridization in Differential Evolution to solve the Flexible Job Shop Scheduling Problem](https://journal.info.unlp.edu.ar/JCST/article/view/1353)
 
-# Compilar
-make DE
+### Directory structure
+The code of the algorithm is present on de_for_fjssp.ccp file.
+In the folders you can found:
 
-# Ejecutar
-make runDE
-./de_for_fjssp.out filename NP max_generations F(x100) CR(x100)
+    -- base: the DE base algortihm
+    -- inc: some usefull funtions.
+    -- standard: standard code use around all the LISI group in UNLPam.
 
-# Compilar para valgrind
-make valgrind
+### Build
+    make DE
 
-# Ejecutar para valgrind
-make runDE_valgrind
+### Run
+    make runDE
+    ./de_for_fjssp.out filename NP F(x100) CR(x100) PLS(x100)
 
-# Git
-git add .
-git commit -m "Nombre del commit"
-git push origin master
+### Build for valgrind
+    make valgrind
 
-# SSH
-ssh franco@190.105.160.50 -p 2222
+### Run with valgrind
+    make runDE_valgrind

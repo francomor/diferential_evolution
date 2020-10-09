@@ -172,27 +172,12 @@ void generate_machine_alternatives_vector_per_operations(int D, int **job_data, 
             // 100 is like a NULL value set in readInstance.cpp
             machine_time = job_data[i][j];
             if (machine_time != 100) {
-                machines_alternatives[i][machines_count] = machine_time;
+                machines_alternatives[i][machines_count] = j+1;
                 machines_count ++;
             }
         }
         amount_of_machines_per_operations[i] = machines_count;
     }
-    // cout << flush << " \n";
-    // cout << "amount of machines per operations" << " \n";
-    // for (int i=0; i<D; i++) {
-    //     cout << amount_of_machines_per_operations[i] << " ";
-    // }
-
-    // cout << flush << " \n";
-    // cout << "machines alternatives" << " \n";
-    // for (int i=0; i<D; i++) {
-    //     cout << i << " - " << amount_of_machines_per_operations[i] << ": ";
-    //     for(int j=0;j<amount_of_machines_per_operations[i];++j) {
-    //         cout << machines_alternatives[i][j] << " ";
-    //     }
-    //     cout << "\n";
-    // }
 }
 
 void initialize_individuals_randomly (double **population, double *lower_bound, double *upper_bound, double *individuals_fitness, int NP, int D, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives) {
@@ -275,18 +260,7 @@ double DE_evaluate (double *individual, int D, int **job_data, int *number_opera
     Solution *solution = new Solution;
     solution->op = init_int_array (D); 
     solution->job = decode_solution (individual, D, number_operations_per_job, number_of_jobs);
-    cout << flush << " \n";
-    cout << "operations vector" << " \n";
-    for (int i=0; i<D; i++) {
-        cout << solution->job[i] << " ";
-    }
     int *assigned_machines_times_vector = generate_machines_vector(individual, D, amount_of_machines_per_operations, machines_alternatives, upper_bound, solution->job, number_operations_per_job, number_of_jobs);
-
-    cout << flush << " \n";
-    cout << "time machines vector " << " \n";
-    for (int i=0; i<D; i++) {
-        cout << assigned_machines_times_vector[i] << " ";
-    }
 
     fitness = evaluate_with_machine_vector(*solution, current_fitness , number_of_machines, number_of_jobs, D, number_operations_per_job, job_data, evaluation_up_to_date, assigned_machines_times_vector);
 
