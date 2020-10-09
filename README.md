@@ -1,13 +1,13 @@
-# Diferential evolution algorithm with Local Search to solve the FJSSP (Flexible Job Shop Scheduling Problem)
+# Differential evolution algorithm with Local Search to solve the FJSSP (Flexible Job Shop Scheduling Problem)
 This implements and hybrid DE NPE/rand/1/bin optimization algorithm with local search to solve the FJSSP, documented in this paper:
 [Parallelism and Hybridization in Differential Evolution to solve the Flexible Job Shop Scheduling Problem](https://journal.info.unlp.edu.ar/JCST/article/view/1353)
 
 ### Directory structure
-The code of the algorithm is present on de_for_fjssp.ccp file.
+The code of the algorithm is present in the de_for_fjssp.ccp file.
 In the folders you can found:
 
-    -- base: the DE base algortihm
-    -- inc: some usefull funtions.
+    -- base: the base DE algorithm
+    -- inc: some useful functions.
     -- standard: standard code use around all the LISI group in UNLPam.
 
 ### Build
