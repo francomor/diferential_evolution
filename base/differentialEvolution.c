@@ -1,3 +1,4 @@
+ 
 /* 
  * This implements the NPE/rand/1/bin optimization algorithm for minimization problems.
  *
@@ -230,7 +231,7 @@ double** init_matrix (int number_rows, int number_columns) {
 	double **matrix = (double **) malloc (number_rows * sizeof(double*));
 	int i, j;
 	if (matrix  == NULL) {
-		printf ("Problemas reservando memoria");
+		printf ("Found problems in memory allocation");
 		exit (1);
 	}
 	for (i=0; i<number_rows; i++) {
@@ -265,7 +266,7 @@ double* init_array_with_value (int size, double value) {
 double* init_array (int size) {
 	double *array = (double *) malloc (size * sizeof(double));
 	if (array  == NULL) {
-		printf ("Problemas reservando memoria");
+		printf ("Found problems in memory allocation");
 		exit (1);
 	}
 	return array;
