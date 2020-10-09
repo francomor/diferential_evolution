@@ -20,12 +20,6 @@ struct individual{  //al individuo en ICA se lo denomina country
 }; 
 //int N;	//tamaño de una solución
 
-struct EvaluationRequeriment{
-	int *operacion;
-	int *job;
-	int *maquina;
-};
-
 #endif
 
 
