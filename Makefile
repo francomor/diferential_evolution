@@ -16,7 +16,7 @@ all:
 	make DE
 
 runDE:
-	./de_for_fjssp.out "instances_Brandirmarte/Mk10.fjs" 50 50 90 0
+	./de_for_fjssp.out "instances_Brandirmarte/Mk01.fjs" 50 50 90 0
 
 runDE_valgrind:
-	valgrind --leak-check=yes ./de_for_fjssp.out Mk01.fjs 50 90 10 50
+	valgrind --leak-check=yes ./de_for_fjssp.out "instances_Brandirmarte/Mk01.fjs" 50 90 10 0

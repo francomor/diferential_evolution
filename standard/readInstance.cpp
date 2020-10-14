@@ -104,6 +104,7 @@ int readInstanceFJJ(char * filename, int *** JobData, int *M, int *J, int ** N_O
 // 	cout <<endl;
 // //----------------------------
 
-	free(x);
+	delete[] x;
+	a = NULL;
 	return 1;
 }
