@@ -1,15 +1,15 @@
 default:
-	@echo "Make what? (all,  clean)"
+	@echo "Make what? (all,  clean, DE, valgrind). Or run? (runDE, runDE_valgrind)"
 
 
 clean:
 	rm -f de_for_fjssp.out *.o *% *~
 
 DE: 
-	g++ -I /inc -I /standard -lm -o de_for_fjssp.out standard/readInstance.cpp standard/evaluate.cpp inc/util.cc standard/initialSol.cpp de_for_fjssp.cpp -fopenmp
+	g++ -std=c++11 -I /inc -I /standard -lm -o de_for_fjssp.out standard/readInstance.cpp standard/evaluate.cpp inc/util.cc standard/initialSol.cpp de_for_fjssp.cpp -fopenmp
 
 valgrind:
-	g++ -Wall -g -I /inc -I /standard -lm -o de_for_fjssp.out standard/readInstance.cpp standard/evaluate.cpp inc/util.cc standard/initialSol.cpp de_for_fjssp.cpp -fopenmp
+	g++ -std=c++11 -Wall -g -I /inc -I /standard -lm -o de_for_fjssp.out standard/readInstance.cpp standard/evaluate.cpp inc/util.cc standard/initialSol.cpp de_for_fjssp.cpp -fopenmp
 
 all:
 	make clean

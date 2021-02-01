@@ -88,7 +88,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
     int number_of_machines, number_of_jobs, number_of_operations = 0;
     
     readInstanceFJJ (filename_of_FJSSP_instance, &job_data, &number_of_machines, &number_of_jobs, &number_operations_per_job, &job_id_x_operation_id, &number_of_operations);
-    // D = 2d - First d part correspond to machines (routing) and Second part to operations (sequencing)
+    // D = 2d - First d part corresponds to machines (routing) and Second part to operations (sequencing)
     D = number_of_operations * 2;  
     double final_time = (number_of_operations * (number_of_operations / 2) * 30) / NUM_THREADS;
 
@@ -251,14 +251,13 @@ double DE_evaluate (double *individual, int D, int **job_data, int *number_opera
     //current_fitness and evaluation_up_to_date are necessary for evaluate from standard
     double fitness, current_fitness = 0;
     int evaluation_up_to_date = 1;
+
     int d = D / 2;  // D is double dimension
-
-    Solution *solution = new Solution;
-    solution->op = init_int_array (d); 
-
     double *individual_machines_half = individual;
     double *individual_operations_half = individual + d;
 
+    Solution *solution = new Solution;
+    solution->op = init_int_array (d); 
     solution->job = decode_solution (individual_operations_half, d, number_operations_per_job, number_of_jobs);
     int *assigned_machines_vector = generate_machines_vector(individual_machines_half, d, amount_of_machines_per_operations, machines_alternatives, upper_bound, solution->job, number_operations_per_job, number_of_jobs);
 
