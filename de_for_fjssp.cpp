@@ -515,7 +515,7 @@ std::vector<int> get_new_possible_machines_for_this_operation (int index_operati
 void machines_vector_backward_conversion (double *individual_machines_half, int *permutation_vector, int *assigned_machines_vector, int d, int number_of_jobs, int *amount_of_machines_per_operations, int *number_operations_per_job, double *individual_lower_bound, double *individual_upper_bound) {
     int i, lj, job_number, job_operations_processed, index_of_operation_in_machines = 0;
     double min_value = 0, max_value = 1; 
-    // qa y acomodar el codigo
+    
     for (job_number=0; job_number < number_of_jobs; job_number++) {
         job_operations_processed = 0;
         for (i=0; i<d; i++) { 
