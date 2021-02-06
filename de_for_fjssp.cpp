@@ -33,8 +33,14 @@ void change_permutation_vector_to_permutation_with_repetitions (int *permutation
 int* generate_machines_vector(double *individual_machines_half, int d, int *amount_of_machines_per_operations, int **machines_alternatives, double *upper_bound, int *permutation_vector, int *number_operations_per_job, int number_of_jobs);
 int select_machine_to_use(double xj, int amount_of_machines, double upper_bound);
 int run_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_upper_bound);
-int run_aggressive_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_upper_bound);
+int run_aggressive_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_lower_bound, double *individual_upper_bound);
 bool LS_evaluate_and_select (double *individual, int D, double *fitness_of_individual, int index1, int index2, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_upper_bound);
+int run_machine_change_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives,double *individual_lower_bound,  double *individual_upper_bound);
+void machine_change_local_search (double *individual, int d, int *number_operations_per_job, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_lower_bound, double *individual_upper_bound);
+int* change_to_better_machine_in_one_job (int *assigned_machines_vector, int d, int *amount_of_machines_per_operations, int **machines_alternatives, int *permutation_vector, int *number_operations_per_job);
+int calculate_index_of_operation_in_machines (int *permutation_vector, int index_operation_to_alter, int *number_operations_per_job);
+std::vector<int> get_new_possible_machines_for_this_operation (int index_operation_to_alter, int *possible_machines_this_operation, int amount_of_machines_this_operation, int *assigned_machines_vector);
+void machines_vector_backward_conversion (double *individual_machines_half, int *permutation_vector, int *assigned_machines_vector, int d, int number_of_jobs, int *amount_of_machines_per_operations, int *number_operations_per_job, double *individual_lower_bound, double *individual_upper_bound);
 double best_fitness_of_population (double **population, double *individuals_fitness, int NP, double *best_individual, int D);
 void copy_population (double **source, double **destination, int NP, int D);
 void copy_individual (double *source, double *destination, int D);
@@ -119,7 +125,7 @@ void run_diferential_evolution_for_fjssp (char *filename_of_FJSSP_instance, int 
             time_of_best_global_fitness = time (NULL) - initial_time;
         }
 
-        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_local_search (population, NP, D, PLS, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs, amount_of_machines_per_operations, machines_alternatives, upper_bound);
+        total_of_evaluation_in_local_search = total_of_evaluation_in_local_search + run_machine_change_local_search (population, NP, D, PLS, individuals_fitness, job_data, number_operations_per_job, number_of_machines, number_of_jobs, amount_of_machines_per_operations, machines_alternatives, lower_bound, upper_bound);
         total_iter ++;
         total_time = (time(NULL) - t_ini) * 1000;
     } while ((total_time < final_time));  // milliseconds   
@@ -263,12 +269,8 @@ double DE_evaluate (double *individual, int D, int **job_data, int *number_opera
 
     fitness = evaluate_with_machine_vector(*solution, current_fitness , number_of_machines, number_of_jobs, d, number_operations_per_job, job_data, evaluation_up_to_date, assigned_machines_vector);
 
-    individual_machines_half = NULL;
-    free (individual_machines_half);
-    individual_operations_half = NULL;
-    free (individual_operations_half);
-    assigned_machines_vector = NULL;
     free (assigned_machines_vector);
+    assigned_machines_vector = NULL;
     free (solution->op);
     free (solution->job);
     delete solution;
@@ -312,7 +314,7 @@ void change_permutation_vector_to_permutation_with_repetitions (int *permutation
 
 int* generate_machines_vector(double *individual_machines_half, int d, int *amount_of_machines_per_operations, int **machines_alternatives, double *upper_bound, int *permutation_vector, int *number_operations_per_job, int number_of_jobs) {
     int *assigned_machines_vector = init_int_array (d);
-    int i, machine_to_use, index, job_operations_processed, job_number;
+    int i, machine_to_use, job_operations_processed, job_number;
     int index_of_operation_in_machines = 0;
 
     for (job_number=0; job_number < number_of_jobs; job_number++) {
@@ -323,15 +325,14 @@ int* generate_machines_vector(double *individual_machines_half, int d, int *amou
                     assigned_machines_vector[i] = machines_alternatives[index_of_operation_in_machines][0];
                 } else {
                     machine_to_use = select_machine_to_use(individual_machines_half[i], amount_of_machines_per_operations[index_of_operation_in_machines], upper_bound[index_of_operation_in_machines]);
-                    index = machine_to_use - 1;
-                    assigned_machines_vector[i] = machines_alternatives[index_of_operation_in_machines][index];
+                    assigned_machines_vector[i] = machines_alternatives[index_of_operation_in_machines][machine_to_use];
                 }
                 index_of_operation_in_machines++;
                 job_operations_processed++;
             }
 
             if (job_operations_processed == number_operations_per_job[job_number]) {
-                break;
+                i = d + 1; // break;
             }
         }
     }
@@ -341,11 +342,13 @@ int* generate_machines_vector(double *individual_machines_half, int d, int *amou
 
 int select_machine_to_use(double xj, int amount_of_machines, double upper_bound) {
     // from paper Flexible job shop scheduling using hybrid differential evolution algorithms eq 6
-    double machine_to_use = (1 / (2 * upper_bound)) * (amount_of_machines - 1) * (xj + upper_bound) + 1;
+    // In this paper, the authors sum 1 to the machine to use. 
+    // We don't, because our machine's index starts at 0.
+    double machine_to_use = (1 / (2 * upper_bound)) * (amount_of_machines - 1) * (xj + upper_bound);
     return (int)round(machine_to_use);
 }
 
-int run_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_upper_bound) {
+int run_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_lower_bound, double *individual_upper_bound) {
     int i, number_of_evaluations_done = 0;
     int lower_bound, upper_bound, index1, index2;
     lower_bound = 0;
@@ -365,7 +368,7 @@ int run_local_search (double **population, int NP, int D, double PLS, double *in
     return number_of_evaluations_done;
 }
 
-int run_aggressive_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_upper_bound) {
+int run_aggressive_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_lower_bound, double *individual_upper_bound) {
     int i, j, number_of_evaluations_done = 0;
     int lower_bound, upper_bound, index1, index2;
     bool finish_LS_for_this_individual;
@@ -410,6 +413,147 @@ bool LS_evaluate_and_select (double *individual, int D, double *fitness_of_indiv
     }
     free (trial_individual);
     return is_beter_individual_find;
+}
+
+int run_machine_change_local_search (double **population, int NP, int D, double PLS, double *individuals_fitness, int **job_data, int *number_operations_per_job, int number_of_machines, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_lower_bound, double *individual_upper_bound) {
+    int i, number_of_evaluations_done = 0; // Needed for code compatibility
+    int d = D / 2;  // D is double dimension
+
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (i=0; i<NP; i++){
+            if (drand48() < PLS) {
+                machine_change_local_search (
+                    population[i], d, number_operations_per_job, number_of_jobs, 
+                    amount_of_machines_per_operations, machines_alternatives, individual_lower_bound, individual_upper_bound
+                    );
+            }
+        }
+    }
+
+    return number_of_evaluations_done;
+}
+
+void machine_change_local_search (double *individual, int d, int *number_operations_per_job, int number_of_jobs, int *amount_of_machines_per_operations, int **machines_alternatives, double *individual_lower_bound, double *individual_upper_bound) {
+    int *permutation_vector, *assigned_machines_vector;
+    double *individual_machines_half, *individual_operations_half;
+
+    individual_machines_half = individual;
+    individual_operations_half = individual + d;
+
+    permutation_vector = decode_solution (individual_operations_half, d, number_operations_per_job, number_of_jobs);
+    assigned_machines_vector = generate_machines_vector(individual_machines_half, d, amount_of_machines_per_operations, machines_alternatives, individual_upper_bound, permutation_vector, number_operations_per_job, number_of_jobs);
+    assigned_machines_vector = change_to_better_machine_in_one_job(assigned_machines_vector, d, amount_of_machines_per_operations, machines_alternatives, permutation_vector, number_operations_per_job);
+    
+    machines_vector_backward_conversion (individual_machines_half, permutation_vector, assigned_machines_vector, d, number_of_jobs, amount_of_machines_per_operations, number_operations_per_job, individual_lower_bound, individual_upper_bound);
+
+    free (permutation_vector);
+    free (assigned_machines_vector);
+}
+
+int* change_to_better_machine_in_one_job (int *assigned_machines_vector, int d, int *amount_of_machines_per_operations, int **machines_alternatives, int *permutation_vector, int *number_operations_per_job) {
+    int index_of_operation_in_machines, index_operation_to_alter;
+    int new_machine_index, amount_of_machines_this_operation;
+    std::vector<int> possibles_new_machines{};
+
+    index_operation_to_alter = rand() % d;
+    index_of_operation_in_machines = calculate_index_of_operation_in_machines (
+        permutation_vector, index_operation_to_alter, number_operations_per_job
+        );
+
+    amount_of_machines_this_operation = amount_of_machines_per_operations[index_of_operation_in_machines];
+    if (amount_of_machines_this_operation > 1) {
+        possibles_new_machines = get_new_possible_machines_for_this_operation (
+            index_operation_to_alter, machines_alternatives[index_of_operation_in_machines], 
+            amount_of_machines_this_operation, assigned_machines_vector
+            );
+        
+        if (possibles_new_machines.size() > 0) {
+            new_machine_index = rand() % possibles_new_machines.size(); // pick a random machine
+            assigned_machines_vector[index_operation_to_alter] = possibles_new_machines[new_machine_index];
+        }
+        
+    }
+
+    return assigned_machines_vector;
+}
+
+int calculate_index_of_operation_in_machines (int *permutation_vector, int index_operation_to_alter, int *number_operations_per_job) {
+    int i, job_number;
+    int index_of_operation_in_machines = 0;
+
+    job_number = permutation_vector[index_operation_to_alter];
+    for (i=0; i < job_number - 1; i++) { // -1 because the case for this job number is manage in the next for
+        index_of_operation_in_machines = index_of_operation_in_machines + number_operations_per_job[i];
+    }
+    for (i=0; i < index_operation_to_alter; i++) { 
+        if (permutation_vector[i] == job_number) {
+           index_of_operation_in_machines++;
+        }
+    }
+
+    return index_of_operation_in_machines;
+}
+
+std::vector<int> get_new_possible_machines_for_this_operation (int index_operation_to_alter, int *possible_machines_this_operation, int amount_of_machines_this_operation, int *assigned_machines_vector) {
+    int i, actual_machine_value;
+    std::vector<int> new_machine_values{};
+
+    actual_machine_value = assigned_machines_vector[index_operation_to_alter];
+    for (i=0; i < amount_of_machines_this_operation; i++) { 
+        if (possible_machines_this_operation[i] != actual_machine_value) {
+            if (possible_machines_this_operation[i] < actual_machine_value) {
+                new_machine_values.push_back((int)possible_machines_this_operation[i]);
+            }
+        }
+    }
+
+    return new_machine_values;
+}
+
+void machines_vector_backward_conversion (double *individual_machines_half, int *permutation_vector, int *assigned_machines_vector, int d, int number_of_jobs, int *amount_of_machines_per_operations, int *number_operations_per_job, double *individual_lower_bound, double *individual_upper_bound) {
+    int i, lj, job_number, job_operations_processed, index_of_operation_in_machines = 0;
+    double min_value = 0, max_value = 1; 
+    // qa y acomodar el codigo
+    for (job_number=0; job_number < number_of_jobs; job_number++) {
+        job_operations_processed = 0;
+        for (i=0; i<d; i++) { 
+            if (permutation_vector[i] == (job_number + 1)) {
+                lj = amount_of_machines_per_operations[index_of_operation_in_machines];
+                // cout << "lj" << lj << endl;
+                // cout << "individual_machines_half[i]" << individual_machines_half[i] << endl;
+                if (lj == 1) {
+                    individual_machines_half[i] = individual_lower_bound[i] + drand48() * (individual_upper_bound[i] - individual_lower_bound[i]);
+                } else {
+                    // this give as int number but we need real numbers
+                    individual_machines_half[i] = ((2 * individual_upper_bound[i]) / (lj - 1)) * (assigned_machines_vector[i] - 1) - individual_upper_bound[i];
+                }
+
+                if (individual_machines_half[i] < min_value) {
+                    min_value = individual_machines_half[i];
+                }
+                if (individual_machines_half[i] > max_value) {
+                    max_value = individual_machines_half[i];
+                }
+
+                // cout << "next individual_machines_half[i]" << individual_machines_half[i] << endl;
+                index_of_operation_in_machines++;
+                job_operations_processed++;
+            }
+
+            if (job_operations_processed == number_operations_per_job[job_number]) {
+                i = d + 1; // break;
+            }
+        }
+    }
+
+    // min max normalization to [−1,1] https://stats.stackexchange.com/a/178629
+    for (i=0; i<d; i++) { 
+        // cout << "as individual_machines_half[i]" << individual_machines_half[i] << endl;
+        individual_machines_half[i] = 2 * (individual_machines_half[i] - min_value) / (max_value - min_value) - 1;
+        // cout << "normal individual_machines_half[i]" << individual_machines_half[i] << endl;
+    }
 }
 
 double best_fitness_of_population (double **population, double *individuals_fitness, int NP, double *best_individual, int D) {
