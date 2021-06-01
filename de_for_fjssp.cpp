@@ -206,26 +206,18 @@ generate_machine_alternatives_vector_per_operations(
     int machines_count = 0;
     int machine_time;
 
-    // cout << "machines_alternatives: " << endl;
-
     for(int i=0;i<d;++i){
-        // cout << "op " << i << ": ";
         machines_count = 0;
         for(int j=0;j<number_of_machines;++j) {
             // 100 is like a NULL value set in readInstance.cpp
             machine_time = job_data[i][j];
             if (machine_time != 100) {
                 machines_alternatives[i][machines_count] = j+1;
-                // cout << machines_alternatives[i][machines_count] << ", ";
                 machines_count ++;
             }
         }
         amount_of_machines_per_operations[i] = machines_count;
-        // cout << endl;
     }
-
-    // cout << endl;
-
 }
 
 void 
