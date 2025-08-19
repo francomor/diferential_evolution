@@ -1,0 +1,113 @@
+\documentclass[runningheads,a4paper]{llncs}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algpseudocode}  % para pseudocodigo
+%\input{algorithmic} % mi archivo de traducción
+
+\usepackage{url}
+\urldef{\mailsa}\path|francomorero96@gmail.com|    
+\urldef{\mailsb}\path|saltoc@ing.unlpam.edu.ar|    
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{A Simple Differential Evolution Algorithm to Solve the Flexible Job Shop Scheduling Problem}
+
+% a short form should be given in case it is too long for the running head
+\titlerunning{DE for the FJJSP}
+
+
+\author{Franco Morero  \and Carlos Bermudez \and Carolina Salto }
+
+\institute{Facultad de Ingeniería, UNLPam\\
+General Pico, La Pampa, Argentina, CONICET\\
+%\mailsa 
+%\mailsb\\
+}
+
+
+\maketitle
+
+
+\begin{abstract}
+This paper addresses the Flexible Job Shop Scheduling Problem (FJSSP) where the objective is to minimize the makespan. We develop a parallel hybrid Differential Evolution (DE) algorithm to tackle this problem. A random key representation of the FJSSP is adopted, which requires a very simple conversion mechanism to obtain a feasible schedule. This allows the DE algorithm to work on the continuous domain to explore the problem space of the discrete FJSSP. Moreover, a simple local search algorithm is embedded in the DE framework to balance the exploration and exploitation by enhancing the local searching ability. In addition, parallelism of the DE operations is included to improve the efficiency of whole algorithm. Experiments confirm the significant improvement achieved by integrating the propositions introduced in this study. Additional, test results show that our algorithm is competitive when compared with most existing approaches for the FJSSP. 
+\keywords{flexible job shop scheduling, differential evolution algorithm, parallelism}
+\end{abstract}
+
+
+\section{Introduction}
+\vspace{-0.4cm}
+%Hablar sobre DE, que todos sus operadores están pensados para reales. 
+%Resolver el problema FJSSP utilizando una representación basada en reales lo cual implica una aplicación directa del DE sin necesidad de utilizar operadores específicos para otras representaciones que pueden complicar o bien alejar la concepción básica del DE
+
+%hacer un pequeño estado del arte de soluciones del FJSSP utilizando DE haciendo hincapié en la representación adoptada. Incluir el trabajo de los chicos (creo)
+
+%Mencionar las ventajas del paralelismo en la resolución de un problema y de las formas posibles de incorporar paralelismo, la adoptada en este trabajo.
+
+%detallar objetivo del trabajo, metodología/contribuciones.
+
+%organización del trabajo.
+
+%Some of the real-life optimization problems cannot be tackled by exact methods which would be implemented laboriously and in a time-consuming manner. For such optimization problems, metaheuristics are used with less computational effort to find good solution from a set of large feasible solutions. One example of this kind of problems is the scheduling problem. There are a considerable amount of efforts devoted to solve this problem, explained not only by the fact that most of the problems in the family of scheduling are computationally hard~\cite{Pinedo:2008:STA:1477600} and therefore there is still room for improvement in the resolution methods, but also because manufacturing and production are continuously changing and introducing more and more demanding restrictions.
+
+%The Job Shop Scheduling Problem (JSSP) is one of most important and difficult problems~\cite{Pinedo:2008:STA:1477600} in the scheduling problem family. Each job has to undergo multiple operations on the various machines. The decision concerns how to sequence the operations on the machines, so that the time needed to complete all the jobs (makespan) is minimized. The possibility of selecting alternative routes among the machines is useful in production environments where multiple machines are able to perform the same operation (possibly with different processing times), as it allows the system to absorb changes in the demand of work or in the performance of the machines. When this factor is considered, the problem is known as Flexible Job Shop Scheduling Problem (FJSSP).
+
+%One example of 
+A realistic production environment, and with practical applicability, is the Flexible Job Shop Scheduling Problem. Each job has to undergo multiple operations on the various machines. The decision concerns how to sequence the operations on the machines, so that the time needed to complete all the jobs ($C_{max}$) is minimized. Moreover, an additional decision consists in to assign each operation to the appropriate set of machines. These decisions suggest that the FJSSP is a complex optimization problem (NP-hard problem~\cite{Garey:1976:CFJ:2782828.2782830}), %the adoption of heuristic methods is suggested because they produce reasonably good schedules in a reasonable time, instead of looking for an optimum solution, also for small instances. In recent years, 
+consequently, the adoption of metaheuristic~\cite{Talbi,Luque:2013:PGA:2564896} has led to better results than classical dispatching or greedy heuristic algorithms~\cite{tang2011,Wang2012917,WANG2017}. %\cite{Mastrolilli1996,Pezzella20083202,Vilcot2008398,Zhang20091309,Zhang2011}.
+Since introduced in 1997 by Storn and Price~\cite{Storn1997}, the Differential Evolution (DE) metaheurisitc became very popular among computer scientists and practitioners almost immediately after its original definition. 
+
+DE is a stochastic real-parameter global optimizer. It employs simple mutation and crossover operators to generate new candidate solutions, and applies one-to-one competition scheme to greedily determine whether the new candidate or its parent will survive in the next generation. Their successful is due to its simplicity and ease implementation, and reliability and high performance. DE algorithms have been applied to many combinatorial optimization problems 
+%, ranging from Scheduling Problems [3] to routing vehicles~\cite{MINGYONG2010188,Teoh:2015:DE-CVRP}. Moreover, DEs have been applied for solving structural optimization problems~\cite{GRECO20191,Hull:DE-StructuralOpt}, for parameter/tolerance design problems~\cite{Rout2010}, and health monitoring (Casciati, 2008), among many others. 
+(\cite{%MINGYONG2010188,
+Teoh:2015:DE-CVRP,GRECO20191,Hull:DE-StructuralOpt,Rout2010}, among many others), but as far as we are aware, there is few published research work that describes the use of DE to deal with the FJSSP~\cite{YUAN2013246}. 
+
+
+In this work, a simple DE to solve the FJSSP is design. As DE was originally devised for solving continuous optimization problems, we adopt a real value representation for the FJSSP  to make the continuous DE applicable for solving the discrete FJSSP, which implies that algorithm operations should not be modified or adapted to resolve the problem. Another important feature of DE is the little number of parameters to be set, when compared to other evolutionary algorithms%: with only three parameters, the algorithm behaviour can be controlled
+. However, the success to find good solutions to a problem depends on discovering the correct values of those parameters~\cite{%Nero2010,
+app8101945}. Therefore, we make an analysis in this line to determine the adequate values for these parameters for solving the instances of the FJSSP. Moreover, a simple local search procedure is embedded to the DE to improve their exploration capacities by solving the problem. Finally, parallelism at algorithmic level~\cite{Talbi} is incorporated to the design of the DE, with the aim of improving the scalability and reducing the computation time.  %Therefore, the contributions of this work are:
+%\begin{itemize}
+%\item design of a simple DE to solve the FJSSP in the real-value search space,
+%\item improvement of the DE with a simple and efficient local search procedure,
+%\end{itemize}
+The experimental methodology we have followed consists of computing the $C_{max}$ values for the different DE proposed to solve the FJSSP and then comparing the obtained results by considering different quality indicators. We find that our simple DE shows a promising behavior to solve the FJSSP.% when compared to other metaheuristics of the literature.
+
+The  paper is organized as follows. In Section~\ref{sec:FJSSP}, we introduce the problem formulation %and show an illustrative example of input data
+.  In Section~\ref{sec:DE}, we present the basic DE algorithm. In Section~\ref{sec:HDE} we explain the adaptations of the DE to solve the FJSSP. In the following section, we introduce the experimental design and in Section 6, we evaluate the results. %Further, in Section 6 we make a comparison between these metaheuristics and the ones present in the literature. 
+Some final remarks and future research directions are given in Section 7.
+
+\input{FJJSP.tex} %problem description
+
+\input{DE.tex} %DE description
+
+\input{DE-FJSSP.tex} %DE description
+
+\input{experimentalDesign}
+
+\input{Results.tex}
+
+\section{Conclusions}
+\vspace{-0.4cm}
+In this article, we have presented a simple DE algorithm to solve the FJSSP. In
+this study, the traditional real-parameter global optimizer is considered to maintain the properties of the DE in their natural configuration. The DE is enhanced with a very simple local search procedure, obtaining a hybrid DE (HDE). Moreover, each iteration of the DE is parallelised to speed up the computation. The results indicate that the HDE with a high probability, at which the local search procedure is applied, is able to find the best solutions for the FJSSP. Moreover, when HDE is contrasted with algorithms in the literature, it also becomes a competitive approach. As a consequence, HDE gives good solutions to this NP-hard problem in an efficient and competitive way.
+
+As future research activities, we will plan to extend the study by including another set of instances with high dimensionality. Furthermore, variants of the FJSSP with more constraints will be evaluated considering the approaches developed in this article.
+
+\section*{Acknowledgements}
+\vspace{-0.4cm}
+This research is is supported by Universidad Nacional de La Pampa, and the Incentive Program from MINCyT. The last author acknowledges CONICET.
+
+\scriptsize
+\bibliographystyle{IEEEtran}
+\bibliography{fjsspBiblio}
+
+\end{document}
+        

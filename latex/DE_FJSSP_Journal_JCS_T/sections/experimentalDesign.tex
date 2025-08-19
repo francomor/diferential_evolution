@@ -1,0 +1,66 @@
+\section{Experimental Design} \label{sec:experDesig}
+
+In this section, we describe the experimental design followed in this approach. We have selected a wide range of FJSSP instances used in the literature taking into account their complexity, which is given by the number of jobs and machines, and the wide variation of flexibility in the number of available machines per operation. In this sense, we considered the data set proposed by Brandimarte~\cite{brandimarte1993} as a representative one. The number of jobs ranges from 10 to 20, the number of machines belongs to the set \{4,15\} and the number of operations for each job varies from 5 to 15. Consequently, the total number of operations ranges from 55 to 240. The flexibility is between 1.43 and 4.10.
+
+Concerning the methodology followed to analyze the results, first, we studied the behavior of these algorithms with different $F$ and $Cr$ values, considering the best $C_{max}$ found and the number of iterations to reach them for each instance. This analysis allows us to determine the best values for the control parameters. Secondly, we determined the impact of incorporating a local search procedure at different rates of $p_{LS}$. For this purpose, we take into account the best $C_{max}$ found, and the number of iterations to reach the best solution for each instance. Finally, we study DE's behaviour including parallelism regarding the execution time of each approach. The analyses are principally validated by the data in the tables and figures shown in the experimental research section.
+
+The parametric configuration considered for DE's experimentation is the following. The population size $N_P$ is set to 50. The $F$ factor and the $Cr$ probability are tested with three different values (0.1, 0.5, and 0.9). For the remaining parameter, $p_{LS}$, three values are also analysed (0.1, 0.5 and 0.7). Table~\ref{tab:parameteres} shows a summary of the parameters.
+
+\begin{table}[tb]
+\scriptsize
+\centering
+\caption{Parameter Values}
+\begin{tabular}{cc}
+\hline
+\multicolumn{1}{c}{Parameter} & \multicolumn{1}{c}{Values} \\ 
+\hline
+NP                              & 50                          \\
+F                               & 0.5, 0,7, and 0,9           \\
+Cr                              & 0.1 and 0.9                 \\
+$p_{LS}$                          & 0.5, 0,7, and 0,9          \\
+\hline
+\end{tabular}
+\label{tab:parameteres}
+\end{table}
+%
+\begin{table*}[!tb]
+    \scriptsize
+  \centering
+  \caption{Best values of $ C_{max} $ found by the DE algorithm with different $F$ and $Cr$ values for all FJSSP instances}
+    \begin{tabular}{rrccccccccc|}
+    \hline
+\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{} & \multicolumn{3}{c|}{\textbf{F=0.1}} & 
+\multicolumn{3}{c|}{\textbf{F=0.5}} & 
+\multicolumn{3}{c|}{\textbf{F=0.9}}  \bigstrut\\
+    \cline{3-11}
+    \multicolumn{1}{|c|}{{\textbf{Inst.}}} & \multicolumn{1}{c|}{{\textbf{Opt.}}} & \multicolumn{1}{c|}{\textbf{Cr=0.1}} & \multicolumn{1}{c|}{\textbf{Cr=0.5}} & \multicolumn{1}{c|}{\textbf{Cr=0.9}} & \multicolumn{1}{c|}{\textbf{Cr=0.1}} & \multicolumn{1}{c|}{\textbf{Cr=0.5}} & \multicolumn{1}{c|}{\textbf{Cr=0.9}} & \multicolumn{1}{c|}{\textbf{Cr=0.1}} & \multicolumn{1}{c|}{\textbf{Cr=0.5}} & \multicolumn{1}{c|}{\textbf{Cr=0.9}} \bigstrut\\
+    \hline
+    \multicolumn{1}{|c|}{Mk01} & \multicolumn{1}{c|}{40} & \multicolumn{1}{c|}{\textbf{40}} & \multicolumn{1}{c|}{\textbf{40}} & \multicolumn{1}{c|}{\textbf{40}} & \multicolumn{1}{c|}{\textbf{40}} & \multicolumn{1}{c|}{\textbf{40}} & \multicolumn{1}{c|}{\textbf{40}} & \multicolumn{1}{c|}{\textbf{40}} & \multicolumn{1}{c|}{\textbf{40}} & \textbf{40} \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk02} & \multicolumn{1}{c|}{26} & \multicolumn{1}{c|}{\textbf{26}} & \multicolumn{1}{c|}{27} & \multicolumn{1}{c|}{27} & \multicolumn{1}{c|}{\textbf{26}} & \multicolumn{1}{c|}{27} & \multicolumn{1}{c|}{\textbf{26}} & \multicolumn{1}{c|}{27} & \multicolumn{1}{c|}{27} & 27 \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk03} & \multicolumn{1}{c|}{204} & \multicolumn{1}{c|}{\textbf{204}} & \multicolumn{1}{c|}{\textbf{204}} & \multicolumn{1}{c|}{\textbf{204}} & \multicolumn{1}{c|}{\textbf{204}} & \multicolumn{1}{c|}{\textbf{204}} & \multicolumn{1}{c|}{\textbf{204}} & \multicolumn{1}{c|}{\textbf{204}} & \multicolumn{1}{c|}{\textbf{204}} & \textbf{204} \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk04} & \multicolumn{1}{c|}{60} & \multicolumn{1}{c|}{\textbf{60}} & \multicolumn{1}{c|}{\textbf{60}} & \multicolumn{1}{c|}{65} & \multicolumn{1}{c|}{61} & \multicolumn{1}{c|}{\textbf{60}} & \multicolumn{1}{c|}{\textbf{60}} & \multicolumn{1}{c|}{62} & \multicolumn{1}{c|}{63} & 62 \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk05} & \multicolumn{1}{c|}{172} & \multicolumn{1}{c|}{175} & \multicolumn{1}{c|}{173} & \multicolumn{1}{c|}{173} & \multicolumn{1}{c|}{175} & \multicolumn{1}{c|}{179} & \multicolumn{1}{c|}{173} & \multicolumn{1}{c|}{175} & \multicolumn{1}{c|}{179} & 173 \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk06} & \multicolumn{1}{c|}{58} & \multicolumn{1}{c|}{65} & \multicolumn{1}{c|}{59} & \multicolumn{1}{c|}{63} & \multicolumn{1}{c|}{66} & \multicolumn{1}{c|}{69} & \multicolumn{1}{c|}{59} & \multicolumn{1}{c|}{67} & \multicolumn{1}{c|}{70} & 61 \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk07} & \multicolumn{1}{c|}{139} & \multicolumn{1}{c|}{143} & \multicolumn{1}{c|}{140} & \multicolumn{1}{c|}{142} & \multicolumn{1}{c|}{143} & \multicolumn{1}{c|}{148} & \multicolumn{1}{c|}{140} & \multicolumn{1}{c|}{144} & \multicolumn{1}{c|}{146} & 140 \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk08} & \multicolumn{1}{c|}{523} & \multicolumn{1}{c|}{\textbf{523}} & \multicolumn{1}{c|}{\textbf{523}} & \multicolumn{1}{c|}{\textbf{523}} & \multicolumn{1}{c|}{\textbf{523}} & \multicolumn{1}{c|}{\textbf{523}} & \multicolumn{1}{c|}{\textbf{523}} & \multicolumn{1}{c|}{\textbf{523}} & \multicolumn{1}{c|}{\textbf{523}} & \textbf{523} \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk09} & \multicolumn{1}{c|}{307} & \multicolumn{1}{c|}{318} & \multicolumn{1}{c|}{\textbf{307}} & \multicolumn{1}{c|}{310} & \multicolumn{1}{c|}{321} & \multicolumn{1}{c|}{333} & \multicolumn{1}{c|}{\textbf{307}} & \multicolumn{1}{c|}{321} & \multicolumn{1}{c|}{338} & \textbf{307} \bigstrut\\
+    %\hline
+    \multicolumn{1}{|c|}{Mk10} & \multicolumn{1}{c|}{197} & \multicolumn{1}{c|}{237} & \multicolumn{1}{c|}{210} & \multicolumn{1}{c|}{221} & \multicolumn{1}{c|}{238} & \multicolumn{1}{c|}{245} & \multicolumn{1}{c|}{206} & \multicolumn{1}{c|}{240} & \multicolumn{1}{c|}{246} & 215 \bigstrut\\
+    \hline
+      \multicolumn{2}{c|}{}   & 5/10 & 5/10 & 3/10 & 4/10 & 4/10 & \textbf{6/10} & 3/10 & 3/10 & 4/10 \bigstrut\\
+    \cline{3-11}
+    \end{tabular}%
+   \label{tab:resultDE}
+\end{table*}%
+
+Because of the stochastic nature of the algorithms, we performed 30 independent runs of each test to gather meaningful experimental data and apply statistical confidence metrics to validate our conclusions. Before performing the statistical tests, we first checked whether the data followed a normal distribution by applying the Shapiro-Wilks test. Where the data was distributed normally, we later applied an ANOVA test. Otherwise, we used the Kruskal-Wallis (KW) test to assess whether or not there were meaningful differences between the compared algorithms with a confidence level of 99\%.
+
+The considered algorithms were programmed in C++. Consequently, their runtimes are directly comparable. All algorithms were compiled on the same computer with the same compilation flags, and run on homogeneous hardware. All are positive attributes of a comparison. The experimentation is carried out on a cluster of 4 INTEL I7 3770K quad-core processors, 8 GB RAM, and the Slackware Linux with a 2.6.27 kernel version. To implement the parallel version of DE, a portable programming interface for shared memory parallel computers such us OpenMP~\cite{openMP} is used.

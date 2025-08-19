@@ -1,0 +1,43 @@
+\section{The Flexible Job Shop Scheduling Problem} \label{sec:FJSSP}
+\vspace{-0.4cm}
+The FJSSP can be formally described as follows. A set $J = \{J_1, J_2, . . . , J_n\}$ of independent jobs and a set $U = \{M_1,M_2, . . . , M_m\}$ of machines are given. A job $J_i$ is broken down by a sequence of $O_{i1},O_{i2}, . . . , O_{in_i}$ operations to be performed one after the other according to the given sequence. Each operation $O_{ij}$ can be executed on any among a subset $U_{ij} \subseteq U$ of compatible machines. We have partial flexibility if there exists a proper subset $U_{ij} \subset U$, for at least one operation $O_{ij}$, while we have $U_{ij} =U$ for each operation $O_{ij}$ in the case of total flexibility. The processing time of each operation is machine-dependent. We denote with $d_{ijk}$ the processing time of operation $O_{ij}$ when executed on machine $M_k$. Pre-emption is not allowed, i.e., each operation must be completed without interruption once started. Furthermore, the machines cannot perform more than one operation at a time. All jobs and machines are available at time 0.
+
+The problem is to assign each operation to an appropriate machine (routing problem), and to sequence the operations on the machines (sequencing problem) in order to minimize the makespan ($C_{max}$). This measure is the time needed to complete all the jobs, which is defined as $C_{max} = max_i\{C_i\}$, where $C_i$ is the completion time of job $J_i$.  Table~\ref{tab:proccesingTime} shows an instance of the FJSSP with 3 jobs, 4 machines and 8 operations. The rows and columns correspond to machines and operations, respectively, and the entries of the table are the processing times. %In this example, we have a partial flexible scenario, an ``$-$'' entry in the table means that a machine cannot execute the corresponding operation, i.e., it does not belong to the subset of compatible machines for that operation. %According to the evolution paradigm used in GAs, we will refer to any solution of FJSP as an individual or chromosome.
+
+% \begin{table}[tb]
+% \scrptsize
+%   \centering
+%   \caption{Instance Example for the FJSSP}
+%     \begin{tabular}{ccrrrr}
+%    \hline
+%           & & $M_1$    & $M_2$    & $M_3$    & $M_4$ \\ \hline
+%     \multirow{3}[0]{*}{$J_1$} & $O_{11}$   & --     & 6     & 5     & -- \\
+%     & $O_{12}$   & 4     & 8     & 5     & 6 \\
+%     & $O_{13}$   & 9     & 5     & -     & 7 \\\hline
+%     \multirow{3}[0]{*}{$J_2$} & $O_{21}$   & 2     & -     & 1     & 3 \\
+%     & $O_{22}$   & 4     & 6     & 8     & 4 \\
+%     & $O_{23}$   & 9     & -     & 2     & 2 \\\hline
+%     \multirow{2}[0]{*}{$J_3$} & $O_{31}$   & 8     & 6     & -     & 5 \\
+%     & $O_{32}$   & 3     & 5     & 8     & 3 \\ \hline
+%     \end{tabular}%
+%   \label{tab:proccesingTime}%
+% \end{table}%
+
+\begin{table}[tb]
+\scriptsize
+   \centering
+   \caption{Instance Example for the FJSSP}
+   \label{tab:proccesingTime}%
+\begin{tabular}{c|ccc|ccc|cc}
+\hline
+\multicolumn{1}{l|}{} & \multicolumn{3}{c}{$J_1$} & \multicolumn{3}{c}{$J_2$} & \multicolumn{2}{c}{$J_3$} \\
+\hline
+\multicolumn{1}{l|}{} & $O_{11}$    & $O_{12}$   & $O_{13}$   & $O_{21}$    & $O_{22}$   & $O_{23}$   & $O_{31}$        & $O_{32}$       \\
+\hline
+$M_1$                   & -      & 4     & 9     & 2      & 4     & 9     & 8          & 3         \\
+$M_2$                   & 6      & 8     & 5     & -      & 6     & -     & 6          & 5         \\
+$M_3$                   & 5      & 5     & -     & 1      & 8     & 2     & -          & 8         \\
+$M_4$                   & -      & 6     & 7     & 3      & 4     & 2     & 5          & 3        \\
+\hline
+\end{tabular}
+\end{table}

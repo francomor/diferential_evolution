@@ -1,0 +1,74 @@
+\section{Differential Evolution Algorithm: Background}
+\label{sec:DE}
+\vspace{-0.4cm}
+The DE algorithm was proposed by Storn and Price~\cite{Storn1997} to solve optimization problems with real-valued parameters. DE is a stochastic, population-based  optimization method. Despite having a very simple algorithmic structure, DE has demonstrated a high level of performance when solving a wide variety of very complex problems~\cite{Price:2005}. The optimal or near-optimal solution is obtained by an iterative process which is applied to a set of solutions (population) to achieve a new one. At each step of the process, new solutions arise as a result of perturbations to the current solutions, caused by mutation and recombination operators. %The general structure of the DEA shares similar features with other evolutionary algorithms, such as genetic algorithm (GA)~\cite{holland75}. DE algorithm is different in handling distance and direction information to move the population at the current generation toward the next generation, in virtue of a constructive cooperation between individuals.
+
+The algorithmic framework of DE is described in Algorithm~\ref{alg:algoritmoDE}. The first step (Line 1) consists in the initialization of the population $P^0$ of $N_P$ target vectors of \textit{D} real values ($x_i = (x_{i,1}, x_{i,2}, . . . , x_{i,D}) \in \mathbb{R}^{D}  (1 \leq i \leq N_P)$). Each component $x_{i,j} \in \mathbb{R} (1 \leq j \leq D)$ represents a variable or a parameter of the optimization problem. Usually, each $x_{i,j}$ is bounded to a value in the range $[li_j, ls_j]$, where $li_j$, $ls_j \in \mathbb{R}$ are the lower and upper bound, respectively. The $N_P$ target vectors are initialized randomly by applying Equation~\ref{eqDE:Init}:
+\vspace{-0.2cm}
+\begin{equation}\label{eqDE:Init}
+x_{i,j} = li_{j} + U(0, 1) \times (ls_j - li_j)
+\end{equation}
+%\vspace{-0.1cm}
+\noindent where $U(0, 1)$ is a random number with uniform distribution in the range $[0, 1]$. 
+
+\begin{algorithm}[tb]
+\scriptsize
+    \caption{Differential Evolution Algorithm (DE)} \label{alg:algoritmoDE}
+    \begin{algorithmic} [1]
+    \Require {$F, Cr, N_p$} 
+    \Ensure {$x_{best}$} 
+        \State initialize($P^0$,$N_p$) 
+        \State $g \leftarrow 0$
+        \While {not meet stop criterion}
+            \For {each vector $x_{i}^g$ from $P^g$}
+                \State $v_{i}^g \leftarrow $ mutate($x_{i}^g, P^g, F$) 
+                \State $u_{i}^g \leftarrow $ recombinate($x_{i}^g, v_{i}^g, Cr$)
+                \State $x_{i}^g \leftarrow $ select($x_{i}^g, u_{i}^g$)
+                \State add($P^{g+1}, x_{i}^{g+1}$) 
+            \EndFor
+            \State $g \leftarrow g+1$ 
+        \EndWhile
+        \State$x_{best} \leftarrow $best\_solution($P^{g}$)
+    \end{algorithmic}
+\end{algorithm}
+
+
+%After the initialization step, an iterative process begins, which consists in the application of mutation (Line 5 of Algorithm~\ref{alg:algoritmoDE}), recombination (Line 6), and selection (Line 7) operations until an stop criterion is reached. 
+
+After the initialization step, an iterative process begins. The mutation operation (Line 5 of Algorithm~\ref{alg:algoritmoDE}) obtains a donor vector $v_i^g = (v_{i,1}, v_{i,2}, . . . , v_{i,D})$ for each target vector $x_i^g$ from the current population $P^g$ ($0 \leq g \leq max_{gen}$) following Equation~\ref{eqDE:mutation}. To obtain $v_i^g$, a base vector $x_{r0}^g$ and other two vectors $x_{r1}^g$ y $x_{r2}^g$ are randomly selected from $P^g$, with $r0, r1$ and $r2$ chosen from the set $\{1,2,...,N_P\}$ and all of them are mutually exclusive. The $F \in [0 . . . 1)$ factor, known as scale factor, controls the rate at which the population evolves, in order to avoid their stagnation during the search process. The mutation operator is important to the DE's behaviour because it focuses the search on the most promising areas of the solution space. 
+\vspace{-0.1cm}
+\begin{equation}\label{eqDE:mutation} 
+v_i^g = x_{r0}^g + F \times (x_{r1}^g - x_{r2}^g)
+\end{equation}
+%\vspace{-0.4cm}
+The donor vector is modified by the recombination operator (Line 6), with the aim of increasing the population diversity. This operator creates a trial vector $u_i^g$ through mixing components of the donor vector $v_i^g$ and the target vector $x_i^g$. The most frequently referred crossover operator is the binomial crossover, which is shown in Equation~\ref{eqDE:recombination}:
+\vspace{-0.4cm}
+\begin{equation} \label{eqDE:recombination}
+u_{i,j}^g = \left\lbrace
+\begin{array}{ll}
+v_{i,j}^g & \textup{si } r_j < Cr \vee j = j_r\\
+x_{i,j}^g & \textup{otherwise} 
+\end{array}
+\right.
+\end{equation}
+%\vspace{-0.4cm}
+\noindent where $r_j=U(0, 1)$ is a random value, $j_r$ is also a random value in the set \{1, 2, ...,$D$\}, and finally $Cr$ is a parameter known as recombination probability, which controls the fraction of parameter values that are copied from the donor.
+
+The last step %in the DE's iterative process 
+is the selection operation (Line 7). The trial vector $u_{i}^g$ competes against the target vector $x_{i}^g$ regarding their objective values (obtained applying the objective function to each vector). The best vector is selected to be part of the population $P^{g+1}$ of the next generation%(see the Equation~\ref{eqDE:selection})
+. Clearly, this competition %between parents and children 
+creates a new population with a performance equal or superior to the current one (Line 8). Consequently, DE is an elitist evolutionary algorithm. 
+
+%\begin{equation} ~\label{eqDE:selection}
+%x_{i}^{g+1} = \left\lbrace
+%\begin{array}{ll}
+%u_{i}^g & \textup{if } f(u_{i}^g) \textup{ \textit{ is equal or best than} } f(x_{i}^g)\\
+%x_{i}^g & \textup{otherwise} 
+%\end{array}
+%\right.
+%\end{equation}
+
+The stopping criteria can be set to a preset maximum number of iterations ($max_{gen}$) or some other problem-dependent criterion. Whichever the criteria to be set, the choice has a direct influence on the best solution $x_{best}$ obtained by the algorithm (Line 12). 
+
+DE performance mainly depends on three parameters: scaling factor of the difference vector ($F$), crossover control parameter ($Cr$) and population size ($N_P$). Some guidelines are available to choose the control parameters~\cite{Price:2005}. In this work, $N_P$ and $F$ are chosen  based  on  previous  knowledge  and  keep  it  constant during all runs. % The factor $F$ usually takes a value that ranges from 0.4 to 1.0~\cite{Gamperle02aparameter}. 
+On the other hand, a good value for $Cr$ is 0.1 however, to speed up convergence a greater value can be used.

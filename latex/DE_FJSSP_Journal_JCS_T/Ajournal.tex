@@ -1,0 +1,123 @@
+\documentclass[a4paper]{jcst}
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+%\usepackage{algorithm,algorithmic}
+\usepackage{multirow}
+\usepackage{bigstrut}
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+\clubpenalty=10000  %asigna una "penalización" de 10000 al hecho de dejar líneas huérfanas
+\widowpenalty=10000 %asigna una "penalización" de 10000 al hecho de dejar líneas viudas.
+
+\usepackage{url}
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+% first the title is needed
+\title{Parallelism and Hybridization in Differential Evolution to solve the Flexible Job Shop Scheduling Problem
+\\
+\large Paralelismo e hibridización en un algoritmo de evolución diferencial para resolver el problema de planificación job shop flexible}
+
+\author[1\orcid{0000-0003-1488-3687}]{Franco Morero}
+\author[1\orcid{0000-0001-9767-6194}]{Carlos Bermúdez}
+\author[1,2\orcid{0000-0002-3417-8603}]{Carolina Salto}
+
+\affil[1]{LISI - Facultad de Ingenier\'ia, Universidad Nacional de La Pampa, General Pico, Argentina \authorcr
+\{bermudezc,saltoc\}@ing.unlpam.edu.ar}
+\affil[2]{CONICET, Argentina}
+
+\begin{document}
+
+\maketitle
+\begin{abstract}
+The Flexible Job Shop Scheduling Problem (FJSSP) is one of the most challenging combinatorial optimization problems, with practical applicability in a real production environment. In this work, we propose a simple Differential Evolution (DE) algorithm to tackle this problem. To represent a FJSSP solution, a real value representation is adopted, which requires a very simple conversion mechanism to obtain a feasible schedule. Consequently, the DE algorithm still works on the continuous domain to explore the problem search space of the discrete FJSSP. Moreover, to enhance the local search ability and to balance the exploration and exploitation capabilities, a simple local search algorithm is embedded in the DE framework. Also, the parallelism of the DE operations is included to improve the efficiency of the whole algorithm. Experimental results confirm the significant improvement achieved by integrating the modifications introduced in this study. Additionally, test results show that our algorithm is competitive when compared with most existing approaches for FJSSP.
+
+
+\end{abstract}
+
+\keywords{differential evolution, flexible job shop scheduling, parallelism}
+
+\renewcommand{\abstractname}{Resumen}
+\begin{abstract}
+El problema de planificación \textit{job shop} flexible (FJSSP, en inglés) es uno de los problemas de optimización más desafiantes, con aplicabilidad práctica en ambientes de producción real. En este trabajo, se propone un algoritmo de evolución diferencial (DE, en inglés) simple para resolver el problema en cuestión. Para representar una solución al FJSSP, se adopta una representación de vectores reales, la cual requiere un mecanismo de conversión muy simple para obtener una planifación factible. Consecuentemente, el algoritmo DE continúa trabajando en el dominio continuo para explorar el espacio de búsqueda del problema que es de caracter discreto. Además, para mejorar la habilidad de búsqueda local y lograr un equilibrio entre la exploración y explotación, se incorpora un algoritmo de búsqueda local simple. También, se incluye paralelismo a las operaciones del DE para mejorar la eficiencia del algoritmo. Los resultados obtenidos confirman que el rendimiento del DE mejora en forma significativa al incorporar las propuestas incluidas en este estudio.
+Además, los resultados de las pruebas muestran que nuestro algoritmo es competitivo en comparación con la mayoría de los existentes.
+\end{abstract}
+
+\palabrasclaves{evolución diferencial, paralelismo, planificación de trabajos}
+
+\input{sections/introducción}
+
+\input{sections/FJSSP} %problem description
+
+\input{sections/DE} %DE description
+
+\input{sections/DE-FJSSP} %DE description
+
+\input{sections/experimentalDesign}
+
+\input{sections/results}
+
+\section{Conclusions} \label{sec:conclu}
+
+This paper presented a simple DE algorithm to solve FJSSP, which has significant application value in modern manufacturing environments. In this study, we considered a real-valued representation to code a valid schedule for FJSSP. Consequently, we maintained the good properties of the DE as a problem optimizer because it still works on the continuous domain. The DE was enhanced with a very simple local search procedure (DE$_{LS}$) to balance the exploration and exploitation of the search space. Furthermore, each iteration of the DE$_{LS}$ was parallelized to speed up the computation using the global parallelization model. 
+
+Computational results indicated that the DE with a combination of medium $F$ and high $Cr$ values obtained good quality of $C_{max}$ values in a less number of evaluations. Moreover, the DE$_{LS}$ with a high probability of application of the local search procedure was able to improve the best solutions found by the DE for FJSSP in a major number of instances. We also obtained a decrease in execution times by introducing parallelization to the DE framework without changing the algorithm behavior. Finally, the comparison of our proposal with several algorithms in the literature indicated that we develop a competitive approach. As a consequence, our simple DE proposal is an efficient and competitive optimizer for this NP-hard problem.
+
+As future research activities, we will plan to extend the study by including another set of instances with high dimensionality. Furthermore, FJSSP variants with more constraints will be evaluated considering the approaches developed in this article.
+
+
+\begin{small}
+
+\competinginterests{
+The authors have declared that no competing interests exist.
+}
+
+\funding{
+The authors acknowledge the support of Universidad Nacional de La Pampa, Universidad Nacional de Río Cuarto, and the Incentive Program from MINCyT. The second author is also funded by CONICET. 
+}
+
+\authorcontributions{
+%This paragraph is required and authors must declare their contribution here. Guidance and criteria for authorship can be found in the section "Publication Ethics and Malpractice Statement" of our website.
+% Please use initials to refer to each author's contribution in this section, for example: "
+All authors conceived the idea, wrote the program, conducted the experiments, analyzed the results, and finally, wrote and revised the manuscript. Moreover, all authors read and approved the final manuscript.
+}
+
+%\acknowledgements{
+%This paragraph is optional and is meant for acknowledgements information.
+%}
+
+\bibliographystyle{IEEEtran}
+\bibliography{biblioFJSSP}
+
+
+\end{small}
+
+\vspace*{2cm}
+
+
+\cornersize{.2} 
+\setlength{\fboxsep}{8pt}
+
+\ovalbox {
+
+\begin{minipage}{7cm}
+\textbf{Citation:} F. Morero, C. Bermudez, C. Salto, 
+
+\emph{Parallelism and Hybridization in Differential Evolution to solve the Flexible Job Shop Scheduling Problem}. Journal of Computer Science \& Technology, vol. 20, no. 1, pp. X-X, 2020.
+
+\textbf{DOI:} XXX
+
+\textbf{Received:} March 18,2020
+\textbf{Accepted:} %August 15, 2017.
+
+\textbf{Copyright:} This article is distributed under the terms of the Creative Commons License CC-BY-NC.
+\end{minipage}
+}
+
+
+
+
+\end{document}

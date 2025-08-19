@@ -1,0 +1,36 @@
+\section{Experimental Design}
+\vspace{-0.4cm}
+%explicar las instancias utilizadas, valores de parámetros analizados (incluir una tabla), análisis estadístico realizado (estaría bueno seguir un formato como el de Federica...)
+In this section, we describe the experimental design used in this approach. We have selected a wide range of FJSSP instances used in the literature taking into account their complexity, which is given by the number of jobs and machines, and the wide variation of flexibility in the number of available machines per operation. In this sense, we considered the data set proposed by Brandimarte~\cite{brandimarte1993} as a representative one, since the number of jobs ranges from 10 to 20, the number of machines belongs to the set \{4,15\} and the number of operations for each job ranges from 5 to 15, consequently the total number of operations ranges from 55 to 240. The flexibility varies between 1.43 and 4.10.
+
+%With respect to the methodology followed to analyze the results, first, we studied the behavior of these algorithms with different $Cr$ values, considering the best $C_{max}$ found and the number of generations/iterations to reach them for each instance. These analysis allows us to determine the best values for the control parameters. Secondly, we determined the impact of incorporating a local search procedure at different rates $P_{BL}$. For this purposes, we took into account the best $C_{max}$ found, the hit rate (i.e. the number of times that an algorithm find the best solution), and the number of generations/iterations to reach the best solution for each instance. Finally, we studied the behaviour of the HDE including parallelism regarding the execution time of each approach. 
+%the normalized gap between the best solution found by each proposed metaheuristic and the best known $C_{max}$ for each instance% (see Equation \ref{gapEq})
+%. Secondly, we analysed the performance of these algorithms taking into account the execution time and the number of evaluations to find the best solution (or $C_{max}$), and also the total number of evaluations carried out by each algorithm. These analyses were principally validated by the data in the tables and figures shown in the experimental research section.
+
+The parametric configuration considered for the DE's experimentation is the following. The population size, $N_P$ is set to 50. The $F$ factor is equal to 0.9. These values were adopted from previous works. Regarding $Cr$ probability, three different values were considered (0.1, 0.5, and 0.9). For the remaining parameter, $P_{LS}$, three values are also analysed (0.1, 0.5 and 0.7).   %shown in Table~\ref{tabDE:parameter}.
+%
+%
+%\begin{table}[tb]
+%\scriptsize
+%\centering
+%\label{tabDE:parameter}
+%\caption{Parameter Values}
+%\begin{tabular}{cc}
+%\hline
+%\multicolumn{1}{c}{Parameter} & \multicolumn{1}{c}{Values} \\ 
+%\hline
+%NP                              & 50                          \\
+%F                               & 0.5, 0,7, and 0,9           \\
+%Cr                              & 0.1 and 0.9                 \\
+%$P_{BL}$                          & 0.5, 0,7, and 0,9          \\
+%\hline
+%\end{tabular}
+%\end{table}
+%
+%The parameter values of the proposed algorithms are selected based on some preliminary trials. The selected parameters are those values that gave the best results concerning both the solution quality and the computational effort. In order to make a fair comparison among these algorithms, they are executed during the same time for each problem instance% (see Equation~\ref{eqtime}). 
+
+Because of the stochastic nature of the algorithms, we performed 30 independent runs of each test to gather meaningful experimental data and apply statistical confidence metrics to validate our conclusions. %As a result, a total of 1,500 executions (5 algorithms $\times$ 10 instances $\times$ 30 independent runs) were carried out. Before performing the statistical tests, we first checked whether the data followed a normal distribution by applying the Shapiro-Wilks test. Where the data was distributed normally, we later applied an ANOVA test. Otherwise,
+As the data do not follow a normal distribution, we used the Kruskal-Wallis (KW) test to assess whether or not there were meaningful differences between the compared algorithms with a confidence level of 99\%.
+
+%The considered algorithms were programmed in C++.%, consequently their runtime are directly comparable. All algorithms were compiled on the same computer with the same compilation flags, and run on homogeneous hardware. %All are positive attributes of a comparison. Consequently, 
+The experimentation is carried out on a cluster of 4 INTEL I7 3770K quad-core processors, 8 GB RAM, and the Slackware Linux with 2.6.27 kernel version. To implement the parallel version of DE, a portable programming interface for shared memory parallel computers such us OpenMP~\cite{openMP} is used.
