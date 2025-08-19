@@ -1,0 +1,237 @@
+\chapter{Metaheurísticas}
+
+\section{Introducción}
+El término \textit{optimización} es muy amplio y se utiliza en una gran variedad de situaciones. Por ejemplo, un científico o ingeniero utiliza la optimización cuando pretende mejorar una idea, haciendo cambios, junto con el conocimiento obtenido en cada cambio  \cite{haupt}. En forma más especifica, existe un gran número de problemas de optimización en diferentes áreas de interés \cite{Mitchell,Goldberg}.
+
+
+Según García-Nieto y Alba en \cite{GarciaNietoAlba}, todos los problemas de optimización comparten algunas características comunes. Al atacar un problema de optimización, es fundamental analizar las alternativas posibles a las distintas variables de decisión del problema a tratar y las restricciones factibles sobre las mismas. Además, es de suma importancia elegir y estudiar solo aquellas variables y restricciones que se consideren más adecuadas. Otro punto a tener en cuenta es seleccionar una medida de calidad para poder evaluar las posibles soluciones al problema.
+
+
+Desde el punto de interés para esta trabajo final y en la inteligencia artificial en general, un problema dado es un \textit{problema de optimización} cuando hay varias \textit{soluciones candidatas} y una manera efectiva de medir la calidad de cada una de las soluciones. La \textit{optimización} es el proceso llevado a cabo para tratar de encontrar la mejor solución candidata al problema, aprovechando al máximo un conjunto limitado de recursos (tiempo, espacio, etc.) \cite{DorigoCaro}.
+
+
+Se llega a la solución cuando se encuentra un conjunto de variables de decisión y/o los valores adecuados para esas variables de decisión. Los valores se deben buscar dentro del dominio de las variables de decisión, siendo los posibles dominios \textit{discretos} o \textit{continuos}. En el primero de los casos, la variable únicamente puede tomar aquellos valores que pertenecen a un conjunto finito. En el segundo, la variable puede tomar un valor fijo dentro de un intervalo determinado perteneciente al conjunto de los números reales. Un problema puede tener sólo variables continuas o sólo variables discretas o una combinación de ambos tipos de variables.
+
+
+Los problemas de optimización son difíciles y complejos de resolver, por la definición del mismo, por el número de variables involucradas, por el dominio al que pertenecen las variables, o por una combinación de estas y muchas otras complejidades. Debido a que la dificultades y el costo computacional pueden ser tan elevados, muchas veces se considera suficiente con alcanzar una solución aproximada a la mejor solución conocida. Por esto, se utilizan algoritmos aproximados en vez de algoritmos exactos.
+
+
+En este capítulo se presenta una introducción a los algoritmos metaheurísticos, luego se presenta una de las posibles calificaciones de las metaheurísticas: en métodos basados en trayectoria y en métodos basados en poblaciones, y por último se explican distintos conceptos de diseños para paralelizar las metaheurísticas.
+
+
+\section{Algoritmos metaheurísticos}
+
+
+Una gran cantidad de problemas de optimización son NP-Duros, \cite{GareyJohnsonTheoryNP} y llegar a una solución no es una tarea fácil. En muchas situaciones, una solución que aproxima a la óptima puede ser suficiente, si logra evitar perder tiempo, dinero o esfuerzo. Por esto, los algoritmos aproximados han tenido un especial interés en las últimas décadas. Estos se pueden dividir en, al menos, dos grandes grupos, los \textit{heurísticos} y los \textit{metaheurísticos}.
+
+
+Los algoritmos heurísticos buscan dentro del espacio de soluciones e intentan encontrar una solución suficientemente buena, aunque no sea la óptima \cite{Brownlee}. Claramente, en estos algoritmos se prefiere el bajo costo y esfuerzo computacional, frente a calidad y precisión de la solución. Usando una heurística, se eligen iterativamente soluciones localmente óptimas hasta lograr aproximarse lo mayor posible a la solución óptima global. 
+
+
+Las metaheurísticas aparecen en la década de los ochenta, presentando una nueva clase de algoritmos estocásticos y aproximados de alto nivel, capaces de hacer frente a problemas de optimización complejos \cite{BlumRoli}. Se utiliza un conjunto de operadores con un diseño abstracto y de alto nivel, lo que evita especificar cuestiones correspondientes al problema a resolver. Si bien no se garantiza llegar a una solución óptima, logran alcanzar una solución cercana a la óptima. Estos algoritmos tienen la ventaja de obtener esa solución utilizando un mínimo de recursos computacionales \cite{Garcia-Nieto}.
+
+
+El éxito de las metaheurísticas depende en gran parte de realizar un correcto balance entre
+\textit{diversificación} e \textit{intensificación}. El primer término, refiere a la capacidad de la técnica de explorar el espacio de soluciones. El segundo, es la habilidad para utilizar la experiencia acumulada en la búsqueda. Estos términos se conocen también como \textit{exploración} y \textit{explotación}, respectivamente. Es de suma importancia lograr el balance entre diversificación e intensificación para distinguir zonas del espacio donde hay soluciones de alta calidad, despreciando aquellas donde las soluciones son de baja calidad.
+
+
+\section{Clasificación de las metaheurísticas}
+Existen distintas estrategias para desarrollar un algoritmo metaheurístico, por lo que resulta de gran dificultad clasificar o agrupar los algoritmos por sus características. Podríamos considerar criterios para clasificar como la fuente en la cuál esta inspirada, el uso de una memoria histórica, el número de funciones objetivo que pueden optimizar simultáneamente, por la manera de generar las soluciones, entre otras.
+
+
+Un criterio de clasificación aceptado es la cantidad de soluciones que las metaheurísticas pueden manipular en forma simultanea. De aquí surgen dos grandes grupos, por un lado los algoritmos basados en una única solución, llamados \textit{métodos basados en trayectorias}, y por el otro los \textit{métodos de búsqueda basados en poblaciones}.
+
+
+Dentro del grupo de los métodos basados en trayectorias se encuentran modificaciones a algoritmos de búsqueda local, que pretenden realizar una exploración inteligente, simple y eficiente de las estructuras de vecindarios. Entre las técnicas más destacadas, podemos mencionar Recocido Simulado \cite{LaarhovenAarts}, Búsqueda Local Iterada \cite{LourencoStutzle}, Búsqueda por Vecindario Variable \cite{HansenMladenovicBrimbergPerez}.
+
+En los métodos de búsqueda poblacionales se utiliza un conjunto de soluciones con el fin de explorar al mismo tiempo varias regiones del espacio de soluciones. Además, estos algoritmos emplean artilugios de aprendizaje explícito o implícito, con el objetivo de detectar correlaciones entre variables. Estas características son fundamentales para lograr descubrir rápida y eficientemente zonas del espacio con soluciones de alta calidad. Dentro de estos tipos de algoritmos encontramos a los Algoritmos Evolutivos \cite{GendreauPotvin, BackFogelMichalewicz}, la Evolución Diferencial \cite{PriceStornLampinen}, los Algoritmos de Inteligencia Colectiva o de Enjambres \cite{KennedyEberhartShi, BlumLi}, Sistema Inmune Artificial \cite{Dasgupta}.
+
+
+En las siguientes sub-secciones se analizan de forma breve algunos de los algoritmos nombrados para cada uno de estos grupos representativos.
+
+
+\subsection{Métodos basados en trayectoria}
+
+Este tipo de algoritmos metaheurísticos inspecciona el espacio de soluciones marcando trayectorias sobre el mismo. La mayoría añade a la búsqueda local algún mecanismo para escapar de óptimos locales durante el proceso de exploración. Comúnmente, utilizan solo una solución, junto con un mecanismo que altera la trayectoria cuando detecta un óptimo local. Estos algoritmos son eficaces para hacer frente a diversos problemas de optimización en diferentes dominios.
+
+Los métodos basados en trayectoria aplican iterativamente los procedimientos de generación y reemplazo de la única solución actual. En la etapa de generación, se crea un conjunto de soluciones $C$($s$) a partir de la solución actual $s$. En la etapa de reemplazo, se realiza un proceso de selección donde se elige una nueva solución del conjunto $C$($s$). Este proceso itera hasta que se cumple un criterio de finalización. En el algoritmo \ref{alg:algoritmoMetodoTrayectoria} se ilustra una plantilla genérica de alto nivel para este tipo de metaheurísticas.
+
+\begin{algorithm} [H]
+    \caption{Plantilla de alto nivel para el método de trayectoria} 
+    \label{alg:algoritmoMetodoTrayectoria} 
+    \begin{algorithmic} [1]
+        \Require {Solución inicial $s_0$} 
+        \Ensure {Mejor solución encontrada} 
+        \State $t=0$
+        \Repeat
+            \State{/* Generar soluciones candidatas a partir de $s_t$ */}
+            \State{Generar ($C$($s_t$))}
+            \State{/* Seleccionar una solución de $C(s)$ que reemplace a la actual $s_t$ */}
+            \State{$s_{t+1} =$ Seleccionar($C$($s_t$))}
+            \State $t=t+1$
+        \Until Se cumpla un criterio de finalización
+    \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Búsqueda local}
+
+La Búsqueda local es probablemente el método metaheurístico más antiguo y simple. Comienza con una solución inicial dada. En cada iteración, la heurística remplaza la solución actual por otra que mejora el resultado de la función objetivo. La búsqueda finaliza cuando todos los posibles candidatos son peores que la solución actual, lo que significa que se alcanzó un óptimo local.
+
+En general, la búsqueda local es un método muy fácil de diseñar e implementar y ofrece soluciones bastante buenas rápidamente. Es por esto que es un método de optimización ampliamente utilizado en la práctica. Una de las principales desventajas es que converge hacia óptimos locales; otra que el algoritmo puede ser muy sensible a la solución inicial.
+
+La búsqueda local funciona bien si no hay demasiados óptimos locales en el espacio de búsqueda o si la calidad de los diferentes óptimos locales es más o menos similar. Si la función objetivo es altamente multimodal, como es el caso de la mayoría de los problemas de optimización, la búsqueda local generalmente no es un método efectivo para usar.
+
+\subsubsection{Recocido Simulado}
+
+La técnica de Recocido Simulado (\textit{Simulated Annealing o SA} en inglés) es un método de búsqueda local con un mecanismo de escape de un mínimo local. Este algoritmo presentado por Kirkpatrick en \cite{KirkpatrickVecchi} y Cerny en \cite{Cerny} se basa en los principios de la mecánica estadística, por lo que el proceso de recocido requiere calentar y luego enfriar lentamente una sustancia para obtener una estructura cristalina fuerte. La resistencia de la estructura depende de la velocidad de enfriamiento de los metales. Si la temperatura inicial no es lo suficientemente alta o se aplica un enfriamiento rápido, se obtienen imperfecciones (estados metaestables). En este caso, el sólido en enfriamiento no alcanzará el equilibrio térmico en cada temperatura. Cristales fuertes surgen de un enfriamiento cuidadoso y lento. El algoritmo SA simula los cambios de energía en un sistema sometido a un proceso de enfriamiento hasta que converge a un estado de equilibrio (estado de congelamiento estable). Este esquema fue desarrollado en 1953 por Metropolis \cite{MetropolisRosenbluth}.
+
+SA se aplica tanto a problemas discretos como continuos. El algoritmo itera comparando la solución actual con una nueva. La técnica tiende a mantener la solución con alta calidad. No obstante, existe un parámetro de \textit{Temperatura} que determina en qué grado se aceptan algunas soluciones de menor calidad con el fin de escapar de un óptimo local.
+
+
+\subsubsection{Búsqueda por Vecindario Variable}
+La Búsqueda por Vecindario Variable (\textit{Variable Neighborhood Search o VNS} en inglés) fue propuesta por Pierre \cite{HansenMladenovic}. La idea básica de VNS es explorar sucesivamente un conjunto de vecindarios predefinidos para brindar una mejor solución. Explora de forma aleatoria o sistemática un conjunto de vecindarios para obtener diferentes óptimos locales y, a su vez, escapar de los óptimos locales. VNS explota el hecho de que el uso de varios vecindarios en la búsqueda local puede generar diferentes óptimos locales y que el óptimo global es un óptimo local para un vecindario determinado. Claramente, es de suma importancia tener cuidado al elegir el conjunto de vecindarios y el método de búsqueda local a utilizar para evitar una convergencia prematura.
+
+
+\subsubsection{Búsqueda Local Iterada}
+
+La técnica de Búsqueda Local Iterada \textit{(Iterated Local Search o ILS} en inglés) fue presentada por Lourenço \cite{LourencoStutzle}. La esencia de la misma es construir iterativamente una secuencia de soluciones generadas por la heurística incorporada, lo que nos lleva a obtener soluciones mucho mejores que si solo se usaran repetidas pruebas aleatorias de esa heurística.
+
+El lineas generales, ILS primero aplica una búsqueda local sobre una solución inicial. Luego, en cada iteración, el algoritmo explora un área reducida del espacio de soluciones, perturbando el óptimo local obtenido y obteniendo una solución intermedia. Al no utilizar una estructura de vecindario para realizar la perturbación, la solución intermedia puede encontrarse en cualquier zona del espacio de soluciones. Finalmente, aplica una búsqueda local a la solución intermedia. La solución generada es aceptada como la nueva solución actual cuando sea de mayor calidad. Este proceso itera hasta que se cumple algún criterio determinado de parada. El mecanismo de perturbación es importante para que el algoritmo tenga éxito. Una perturbación demasiado pequeña no será suficiente para alcanzar un óptimo global, mientras que un exceso en la misma puede provocar variadas búsquedas aleatorias. 
+
+
+\subsection{Métodos basados en población}
+
+Los métodos de búsqueda basados en población, a diferencia de las técnicas por trayectoria, realizan la búsqueda en paralelo sobre varias regiones del espacio de soluciones, es decir, utilizando un conjunto de soluciones, conocido como \textit{población}. Estos métodos iteran inspeccionando varias zonas del espacio de soluciones. La alteración de la población es fundamental para llegar a soluciones cercanas a la óptima.
+
+
+Este tipo de metaheurística comienza con una población inicial de soluciones. En la etapa de generación, se crea una nueva población de soluciones. En la etapa de reemplazo, se realiza un proceso de selección entre la población actual y la nueva. Este procedimiento itera hasta que se llega a un determinado criterio de parada. La generación y las fases de reemplazo pueden ser sin memoria, por lo que en ese caso esas etapas solo se basan en la población actual. Así también, se puede usar una memoria para realizar las dos fases nombradas con anterioridad. La mayoría de las metaheurísticas poblacionales son inspiradas en la naturaleza. En el algoritmo \ref{alg:algoritmoMetodoPoblacion} se puede apreciar una plantilla de alto nivel para este tipo de métodos \cite{TalbiLibro}.
+
+\begin{algorithm} [H]
+    \caption{Plantilla de alto nivel para el método basado en población} 
+    \label{alg:algoritmoMetodoPoblacion} 
+    \begin{algorithmic} [1]
+        \Ensure {Mejor solución encontrada} 
+        \State{/* Generación de la población inicial */}
+        %\State $P_0 = P$
+        \State{Iniciar ($P_t$)}
+        \State $t=0$
+        \Repeat
+            \State{/* Generación de la nueva población */}
+            \State{Generar ($P'_t$)}
+            \State{/* Seleccionar la nueva población */}
+            \State{$P_{t+1} =$ Seleccionar-población($P_{t} \cup P'_t$)}
+            \State $t=t+1$
+        \Until Se cumpla un criterio de finalización
+    \end{algorithmic}
+\end{algorithm}
+
+Las metaheurísticas basadas en poblaciones difieren en la forma en que realizan los procedimientos de generación y selección, como así también de la memoria que utilizan durante el proceso de búsqueda.
+
+\subsubsection{Algoritmos evolutivos}
+Los distintos algoritmos evolutivos se basan en la naturaleza como forma de inspiración para lidiar con problemas difíciles de optimización. En realidad, el proceso darwiniano de evolución natural es un problema de optimización. Particularmente, las especies que habitan nuestro planeta presentan una estructura que es resultado de un proceso de adaptación de miles de años. La adaptación es la forma que tienen las especies para volverse óptimas en su entorno.
+
+
+Diferentes escuelas de algoritmos evolutivos han progresado en forma independiente a partir de 1950: 
+\begin{itemize}
+    \item Algoritmos Genéticos (\textit{Genetic Algorithms o GA} en inglés), desarrollados principalmente en Michigan, EE. UU., por J. H. Holland \cite{Holland, Holland2}.
+    
+    \item Estrategias Evolutivas (\textit{Evolution Strategies} en inglés), desarrolladas en Berlin, Alemania, por I. Rechenberg \cite{Rechenberg, Rechenberg2} y H-P. Schwefel \cite{Schott, Schwefel}.
+    
+    \item Programación Evolutiva (\textit{Evolutionary Programming} en inglés) por L. Fogel en San Diego, EE. UU. \cite{Fogel, FogelOwens}.
+\end{itemize}
+
+Luego, al final de 1980, J. Koza \cite{Koza} propone la Programación Genética (\textit{Genetic Programming} en inglés). Cada uno de estos métodos constituye un enfoque diferente, pero todos están inspirados en los mismos principios de la evolución natural. Además, establecen los principios básicos para los distintos algoritmos evolutivos construidos y/o perfeccionados en los últimos años que persiguen el fin de resolver con una mayor precisión y eficacia los problemas de optimización complejos.
+
+
+Los algoritmos evolutivos se han aplicado con éxito a muchos problemas reales y complejos. Son los algoritmos basados en población mas estudiados. Su éxito en resolver problemas difíciles de optimización en varios dominios promovió un campo de estudio conocido como Computación Evolutiva (\textit{Evolutionary Computation o EC} en inglés) \cite{BackFogelMichalewicz}.
+
+
+Este tipo de algoritmos son métodos iterativos que en el proceso utilizan el valor \textit{objetivo} (mejor conocido como \textit{fitness} en inglés) con el fin de realizar una búsqueda inteligente sobre el espacio de soluciones. Dada la gran relación que presentan este tipo de técnicas con los procesos biológicos, se denomina a las soluciones del problema como \textit{individuos} y a cada iteración \textit{generación}.
+
+
+En cada generación se aplica sobre los individuos de la población $P$ un conjunto de operadores con el fin de obtener nuevos individuos, los cuales reemplazarán a los de la población actual en la generación siguiente. Se repite este proceso hasta alcanzar un criterio de finalización. Los individuos que formarán parte de la población inicial son generados aleatoriamente desde el espacio de soluciones. Luego se aplica sobre ellos un procedimiento de reproducción, utilizando usualmente la recombinación y la mutación, para luego seleccionar las nuevas soluciones.
+
+
+El operador de \textit{recombinación} utiliza un conjunto de individuos de la población actual para producir nuevos individuos. A esos nuevos individuos se le puede aplicar un procedimiento de \textit{mutación} con el fin de provocarles cambios adaptativos. La \textit{selección} es la encargada de elegir individuos teniendo en cuenta el valor obtenido por la función objetivo. La función objetivo $f(\cdot)$ es la encargada de evaluar un individuo $x$ y determinar su calidad para resolver el problema. Se aplican dos procesos de selección, uno para escoger los individuos que serán padres en el proceso de recombinación y otro para elegir los individuos qué reemplazaran a los de la población actual en la próxima generación. El algoritmo \ref{alg:algoritmoEvolutivo} es un esquema genérico de este proceso.
+
+\begin{algorithm} [H]
+    \caption{Plantilla de un Algoritmo Evolutivo} 
+    \label{alg:algoritmoEvolutivo} 
+    \begin{algorithmic} [1]
+        \Ensure {Mejor individuo o mejor población encontrada} 
+        \State{/* Generación de la población inicial */}
+        \State Generar ($P(0)$)
+        \State $t=0$
+        \While {no se cumpla un criterio de finalización}
+            \State{/* Generación de la nueva población */}
+            \State{Evaluar ($P(t)$)}
+            \State{$P'(t) = $ Seleccionar ($P(t)$)}
+            \State{$P'(t) = $ Reproducción ($P'(t)$)}
+            \State{$P'(t) = $ Evaluar ($P'(t)$)}
+            \State{$P(t+1) = $ Reemplazar ($P(t)$,$P'(t)$)}
+            \State $t=t+1$
+        \EndWhile 
+    \end{algorithmic}
+\end{algorithm}
+
+Los tres operadores mencionados son aplicados en la mayor parte de los algoritmos evolutivos. Sin embargo, la flexibilidad que presenta esta técnica permite incorporar otros mecanismos, como por ejemplo una búsqueda local, con el fin de abarcar todo el espacio de soluciones y lograr analizar las mejores regiones del espacio.
+
+
+Existen diferentes subtipos de algoritmos evolutivos, que siguen el esquema general, pero con algunas modificaciones. Entre ellas, la Evolución Diferencial (DE) tiene una estructura algorítmica muy simple, y ha demostrado un muy buen nivel de desempeño al resolver una amplia variedad de problemas muy complejos. En el capítulo \ref{sec:DE} se explicará con mayor detalle y en profundidad este algoritmo.
+
+
+\subsubsection{Algoritmos de inteligencia colectiva}
+
+Existen algoritmos poblaciones inspirados en la naturaleza que utilizan un esquema de inteligencia colectiva al realizar la búsqueda en el espacio de soluciones. Cada elemento de la población en este método es un \textit{agente} sin capacidad propia de ser inteligente. Sin embargo, al colaborar e interactuar con los distintos agentes de la población, se logra una búsqueda inteligente sobre el espacio.
+
+
+Puede encontrar una gran variedad de algoritmos que utilizan la inteligencia colectiva. Un ejemplo es la Optimización basada en Colonia de Hormigas (\textit{Ant Colony Optimization o ACO} en inglés) presentada por Dorigo \cite{CorneDorigoDasguptaMoscato, DorigoBirattari}. La técnica fue realizada inspirándose en la forma en que las colonias de hormigas buscan alimento. A medida que siguen el camino hacia su alimento, los agentes (en este caso las hormigas) dejan rastros de feromonas (información numérica) que es de utilidad para los demás agentes de la colonia para ubicar la fuente de alimentos.
+
+
+Otro claro ejemplo de este tipo de algoritmos es la Optimización basada en Colonia de Abejas Artificiales  (\textit{Artificial Bee Colony o ABC} en inglés) presentada por Karaboga \cite{KarabogaBasturk, Karaboga} . Como en ACO, los agentes simulan el comportamiento de las abejas al buscar alimentos. En este caso, las abejas son quienes se encargan de explorar el espacio, tomando como calidad de la solución a la calidad del néctar. 
+
+
+\subsubsection{Sistema inmune artificial}
+
+Aquí la biología jugo un rol como fuente de inspiración de la técnica de Sistema Inmune Artificial (\textit{Artificial Immune System o AIS} en inglés), desarrollada pensando en simular el sistema inmune humano \cite{CastroTimmis}. El método imita a través de un modelo matemático el comportamiento y las propiedades inmunológicas de las células. En esta técnica, algunos algoritmos utilizan modelos de inmunología simples, mientras que otros aplican conceptos muy finos y con fundamentos interdisciplinarios complejos.
+
+
+\section{Metaheurísticas paralelas}
+Por un lado, los problemas de optimización son cada vez mas complejos y sus necesidades de recursos son cada vez mayores. En la vida real, los problemas de optimización son NP-Duros y requieren un alto tiempo de CPU y un gran uso de memoria para resolverlos. Aunque el uso de metaheurísticas reduce significativamente la complejidad computacional del proceso de búsqueda, continúa demandando mucho tiempo computacional en diversos problemas de distintos dominios de aplicación, donde la función objetivo y las restricciones asociadas al problema hacen un uso intensivo de recursos, y el tamaño del espacio de búsqueda es enorme. Además, cada vez se desarrollan metaheurísticas más complejas que requieren un mayor uso de recursos.
+
+
+Por otro lado, el rápido desarrollo tecnológico en el diseño de procesadores, redes y el almacenamiento de datos ha hecho que el uso de la computación en paralelo sea cada vez más popular. Estas arquitecturas representan una estrategia efectiva para el diseño e implementación de metaheurísticas paralelas. 
+
+
+La computación paralela y distribuida se puede usar en el diseño e implementación de metaheurísticas por las siguientes razones:
+
+\begin{itemize}
+    \item \textbf{Acelerar la búsqueda:} uno de los objetivos principales de aplicar paralelismo en una metaheurística es reducir el tiempo de búsqueda.
+    
+    \item \textbf{Mejorar la calidad de las soluciones:} algunos modelos metaheurísticos paralelos permiten mejorar la calidad de la búsqueda.
+    
+    \item \textbf{Mejorar la robustez:} una metaheurística paralela puede ser más robusta para resolver diferentes problemas de optimización y diferentes instancias de un problema dado. La robustez también esta dada por la sensibilidad de la metaheurística a sus parámetros.
+    
+    \item \textbf{Resolver problemas de gran escala:} las metaheurísticas paralelas permiten resolver instancias de gran escala de problemas complejos de optimización.
+    
+\end{itemize}
+
+
+En términos de diseño de metaheurísticas paralelas, se identifican tres modelos paralelos principales:
+
+\begin{itemize}
+    \item \textbf{Nivel algorítmico:} en este modelo, se utilizan metaheurísticas independientes o cooperativas autocontenidas. La paralelización del algoritmo es independiente del problema. Si las diferentes metaheurísticas fueran independientes, la búsqueda sobre el espacio de soluciones sería equivalente a ejecutar secuencialmente cada una de las metaheurísticas, en término de la calidad de las soluciones obtenidas. Sin embargo, el modelo cooperativo altera el comportamiento de las metaheurísticas y permite mejorar la calidad de las soluciones. 
+    
+    \item \textbf{Nivel de iteración:} en este modelo, cada iteración de la metaheurística se paraleliza. Es independiente del problema y el comportamiento de la metaheurística no se altera. El objetivo principal que persigue este método es acelerar el algoritmo, reduciendo el tiempo de búsqueda.
+    
+    \begin{itemize}
+    \item \textbf{Nivel de iteración para metaheurísticas basadas en trayectoria:} en este modelo, el espacio de soluciones se descompone en diferentes particiones que generalmente tienen el mismo tamaño. Las particiones se generan y luego se evalúan de manera paralela e independiente. 
+    
+    \item \textbf{Nivel de iteración para metaheurísticas basadas en población:} al tratar con metaheurísticas basadas en población los modelos paralelos surgen de forma natural, ya que cada elemento que pertenece a la población (por ejemplo, abejas en ABC, individuos en EA, hormigas en ACO) es una unidad independiente. Las operaciones comúnmente aplicadas a cada uno de los elementos de la población se realizan en paralelo.
+    
+    En los algoritmos evolutivos, la población de individuos se puede descomponer y manejar en paralelo. Un método para realizar la paralelización es la de maestro-trabajador. El maestro realiza las operaciones de selección y de reemplazo que son generalmente procedimientos secuenciales pues requieren una gestión global de la población. Los trabajadores realizan la recombinación, la mutación y la evaluación. El maestro envía las particiones (subpoblaciones) a los trabajadores y estos le devuelven al maestro las nuevas soluciones y su valor de \textit{fitness}.
+    \end{itemize}
+    
+    \item \textbf{Nivel de solución:} en este modelo, el proceso de paralelización maneja una única solución del espacio de búsqueda. Es dependiente del problema. En general, la evaluación de la(s) función(es) objetivo(s) o de las restricciones para una solución es la operación más costosa en una metaheurística. En este método, no se altera el comportamiento de la metaheurística. El objetivo principal es acelerar la búsqueda.
+    
+\end{itemize}

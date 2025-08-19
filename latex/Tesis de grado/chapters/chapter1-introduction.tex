@@ -1,0 +1,100 @@
+\chapter{Introducción} 
+\section{Descripción del trabajo y justificación} 
+
+Las técnicas de optimización juegan un rol importante en el campo de la ciencia y la ingeniería. En las últimas décadas, se han desarrollado varios algoritmos para resolver problemas de optimización complejos. La biología evolutiva o el comportamiento de enjambres inspiraron la mayoría de esos métodos. En este marco evolutivo o de inteligencia de enjambre se han propuesto varias clases de algoritmos que incluyen: algoritmos genéticos \cite{Goldberg, Holland3}, algoritmos metaheurísticos \cite{Moscato}, evolución diferencial (DE) \cite{StornPrice2}, optimización de colonias de hormigas (ACO) \cite{Colorni}, optimización por enjambre de partículas (PSO) \cite{Eberhart}, algoritmo de colonia de abejas artificiales (ABC) \cite{KarabogaBasturk}, entre otros.
+
+
+La evolución diferencial (DE) es un algoritmo evolutivo desarrollado para resolver funciones de espacios continuos. DE es un método de búsqueda estocástico basado en población, que a diferencia de otros algoritmos metaheurísticos poblacionales, enfatiza más la mutación que la recombinación. Al utilizar operaciones de bajo costo computacional (usualmente lineales), resulta muy eficiente y eficaz al resolver problemas de optimización
+
+
+DE ha sido recientemente usado para optimización global en una gran variedad de áreas de problemas tal como planificación \cite{Gnanavel}, diseño ingenieril \cite{Melo}, problemas de optimización con restricción \cite{Ali}, entre otros \cite{Juang,Yang}. En particular, dentro de los ambientes de manufactura, nos encontramos con el problema de planificación job shop flexible (FJSSP). Está probado que este problema es NP-duro \cite{GareyJohnson}, debido a que se tiene que asignar cada operación de un trabajo a una máquina apropiada (problema de ruteo) y secuenciar las operaciones asignadas en cada máquina (problema de secuenciamiento). El objetivo que se persigue es minimizar el tiempo necesario para completar todos los trabajos. A medida que aumenta la cantidad de trabajos, por consiguiente la cantidad de operaciones, y la cantidad de máquinas disponibles, la complejidad del problema crece y por consiguiente la complejidad computacional para resolverlo. La resolución de este problema con algoritmos como DE, trae aparejado tiempos de procesamiento altos. Una manera de hacer frente a estos tiempos de procesamiento altos es utilizar alguna técnica de paralelización que permita distribuir el trabajo en los distintos procesadores y/o cores de nuestro equipo informático. Una de las estrategias es utilizar una configuración paralela maestro-esclavos, utilizando una interfaz de programación de aplicaciones (API), como lo es openMP, para la programación multiproceso de memoria compartida.
+
+
+\section{Objetivos}
+
+El objetivo general de este trabajo es: diseñar un algoritmo DE híbrido para resolver el FJSSP utilizando
+estrategias de distribución del trabajo computacional.
+
+
+Como objetivos específicos, para alcanzar el objetivo general, se plantean los siguientes:
+\begin{itemize}
+    \item Realizar un análisis del estado del arte sobre algoritmos DE y propuestas paralelas.
+    \item Realizar un análisis del estado del arte en la resolución del FJSSP con algoritmos evolutivos.
+    \item Diseñar e implementar el DE híbrido para el FJSSP.
+    \item Diseñar e implementar el DE híbrido paralelo para el FJSSP.
+    \item Realizar la experimentación correspondiente y el análisis de los resultados obtenidos.
+\end{itemize}
+
+\section{Contribuciones}
+La contribución de esta tesis es la obtención de un algoritmo de evolución diferencial híbrido, incorporando una búsqueda local, que permite resolver el problema de \textit{job shop flexible} explotando el paralelismo en su ejecución. Esto es el resultado de mi trabajo de investigación al incorporarme en el grupo LISI, dentro del marco del programa de Becas de Iniciación en Investigación de la UNLPam en los periodos 2019-2020 y 2020-2021, el cual se respalda con las siguientes publicaciones: 
+
+
+\begin{itemize}
+    \item Morero F., Salto C., and Bermudez C. Parallelism and Hybridization in Differential Evolution to Solve the Flexible Job Shop Scheduling Problem, Journal of Computer Science & Technology, vol 20 (1) 2020. 
+    \item Alfonso H., Bermudez C., Morero F., Minetti G., y Salto C. Utilización de Sistemas Inteligentes para optimizar el diseño de redes de distribución de agua en General Pico - La Pampa, en Libro de actas del XXII Workshop de Investigadores en Ciencias de la Computación (WICC 2020), Universidad Nacional de Patagonia Austral, El Calafate, 2020.
+    \item Morero F., Bermudez C., and Salto C. A Simple Differential Evolution Algorithm to Solve the Flexible Job Shop Scheduling Problem. CACIC 2019. ISBN: 978-987-688-377-1, pág 2-11, October 2019.
+\end{itemize}
+
+
+\section{Metodología}
+
+A continuación se detalla la metodología que se adopta al realizar este trabajo, detallando las fases en las que se divide.
+
+
+La primera fase consiste en la revisión de material bibliográfico relacionado con algoritmos evolutivos, haciendo especial énfasis en algoritmos de evolución diferencial, a fin de adquirir conocimientos necesarios sobre estas técnicas para, en etapas posteriores, poder concretar una propuesta algorítmica. Además, en esta etapa de revisión se estudia el estado del arte en la problemática abordada FJSSP mediante la solución con DE y sus variantes híbridas. Esta fase permite identificar particularidades de las distintas alternativas de solución que resulten más prometedoras para resolver el FJSSP, y que se puedan integrar en una propuesta posterior.
+
+
+En una segunda fase, es necesario el análisis y estudio de posibles paralelizaciones de metaheurísticas, con un enfoque centrado en paralelizar algoritmos de evolución diferencial, con el fin de poder lograr un algoritmo híbrido paralelo con grandes ventajas en tiempo y utilización de recursos computacionales.
+
+
+En una tercera fase, se continua con el diseño y la implementación del DE híbrido paralelo para resolver el FJSSP siguiendo el paradigma procedural, haciendo hincapié en la representación del problema. 
+ 
+
+Concretada la fase anterior, la siguiente consiste en la puesta a punto del algoritmo desarrollado. Para lo cual se deben realizar ejecuciones preliminares y analizar los resultados de las mismas para determinar la mejor configuración de parámetros. Una vez definidos los mismos, se procede al desarrollo de la experimentación completa para finalizar con el análisis de los resultados obtenidos y su estudio estadístico.
+
+
+En la fase final se realiza la escritura del informe del proyecto final incluyendo el desarrollo realizado y el análisis de los resultados obtenidos.
+
+
+\section{Cronograma de trabajo}
+A continuación se detallan las distintas actividades, y su planificación en el tiempo, que surgen para la concreción de los objetivos parciales.
+
+\begin{enumerate}
+    \item Estudiar y analizar el estado del arte en relación a algoritmo DE.
+    \item Estudiar y analizar el estado del arte en relación a posibles paralelizaciones de
+metaheurísticas.
+    \item Diseñar la forma de paralelizar un algoritmo DE para resolver el FJSSP e implementar el algoritmo propuesto, evaluando alternativas de mejora.
+    \item Realizar la experimentación y posterior análisis de resultados.
+    \item Documentar el trabajo realizado.
+\end{enumerate}
+
+Las duraciones estimadas (en horas) de las distintas actividades se muestran en la siguiente tabla:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Actividad} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} \\ \hline
+\textbf{Duración}  & 30         & 20         & 50         & 60         & 40         \\ \hline
+\end{tabular}
+\end{table}
+
+Tiempo total: 200 horas.
+
+\section{Organización de la tesis}
+Los capítulos de esta tesis se organizan de la siguiente manera.
+
+
+El Capítulo 2 contiene los fundamentos teóricos relacionados con metaheurísticas que ayudarán a la comprensión de la presente tesis. El mismo describe brevemente los algoritmos metaheurísticos, la clasificación de las metaheurísticas, tanto en métodos basados en trayectoria como en aquellos basados en poblaciones, y algunas estrategias para metaheurísticas paralelas.
+
+
+El Capítulo 3 introduce al lector en los conceptos de la evolución diferencial, y presenta el algoritmo propuesto por Storn \& Price, junto a sus 4 etapas: inicialización, mutación, recombinación y selección. Además se muestra el proceso iterativo del algoritmo \textit{DE} en un formato de pseudocódigo.
+
+
+El Capítulo 4 expone la propuesta del algoritmo \textit{DE} híbrido para \textit{FJSSP}. Se presenta una descripción del problema a tratar, el diseño de la representación y evaluación de soluciones utilizado, la decodificación de soluciones, el procedimiento de búsqueda local utilizado, la forma en que fue realizada la paralelización de \textit{DE} y la búsqueda local, y por último el pseudocódigo del algoritmo de \textit{DE} híbrido para \textit{FJSSP}.
+
+
+El Capítulo 5 exhibe los estudios experimentales llevados a cabo en este trabajo. Se describe el diseño experimental y los resultados experimentales obtenidos.
+
+
+Por último, el Capítulo 6 presenta las principales conclusiones obtenidas de este trabajo.

@@ -1,0 +1,49 @@
+\documentclass[12pt]{article}
+
+% includes
+\usepackage{geometry}           % page size
+\usepackage[utf8]{inputenc}     % encoding
+\usepackage{palatino}           % font
+\usepackage[spanish,mexico]{babel}    % language
+\usepackage{graphicx}           % images
+\usepackage{indentfirst}        % indentation
+\usepackage[nottoc]{tocbibind}  % table of contents style
+\usepackage[unicode]{hyperref}  % references from the table of contents
+\usepackage{xcolor}             % colorcito al texto
+
+
+% includes options
+\geometry{  a4paper,            % scientific thesis standard
+            left=3cm,
+            right=2cm,
+            top=2cm,
+            bottom=2cm,
+ }
+\graphicspath{{images/}}        % path where the images are located
+\setlength{\parindent}{1cm}     % paragraph indentation
+
+% other options
+\linespread{1.5}                % space between lines
+%\renewcommand*\contentsname{Contenido}    % table of contents name
+
+% the document content
+\begin{document}
+    % macros (global)
+    \input{front/macros}
+    
+    % front-matter
+    \pagenumbering{gobble}
+    
+    \input{front/cover}
+    
+    % table of contents
+    %\input{chapters/motivation}    
+    %\tableofcontents
+    
+    % chapters
+    \setcounter{page}{1}
+    \pagenumbering{arabic}
+    
+    \input{chapters/anteproyecto}
+    \input{chapters/bibliography}
+\end{document}

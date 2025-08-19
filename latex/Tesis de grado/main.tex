@@ -1,0 +1,84 @@
+\documentclass[12pt]{report}
+\setcounter{secnumdepth}{5}
+% includes
+\usepackage{geometry}           % page size
+\usepackage[utf8]{inputenc}     % encoding
+
+\usepackage{palatino} 
+
+\usepackage[spanish,mexico]{babel}    % language
+\usepackage{graphicx}           % images
+\usepackage{indentfirst}        % indentation
+\usepackage[nottoc]{tocbibind}  % table of contents style
+\usepackage[unicode]{hyperref}  % references from the table of contents
+\usepackage{adjustbox} %para ajustar las tablas
+\usepackage{afterpage} %para paginas en blanco
+\usepackage{algorithm}
+\usepackage{algpseudocode}  % para pseudocodigo
+\input{spanishAlgorithmic} % mi archivo de traducción
+\usepackage{enumitem}% http://ctan.org/pkg/enumitem
+\usepackage{xcolor}
+
+% black mode
+%\usepackage[sfdefault]{roboto} % font
+%\pagecolor[rgb]{0.1058823529411765, 0.1294117647058824, 0.1725490196078431} 
+%\color[rgb]{0.95,0.95,0.95}
+% end black mode
+
+\newcommand\blankpage{% para afterpage
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+    
+% includes options
+\geometry{  a4paper,            % scientific thesis standard
+            left=3cm,
+            right=2cm,
+            top=2cm,
+            bottom=2cm,
+ }
+\graphicspath{{images/}}        % path where the images are located
+\setlength{\parindent}{1cm}     % paragraph indentation
+
+% other options
+\linespread{1.5}                % space between lines
+\renewcommand*\contentsname{Contenido}    % table of contents name
+
+% the document content
+\begin{document}
+    % macros (global)
+    \input{front/macros}
+    
+    % front-matter
+    \pagenumbering{gobble}
+    
+    \input{front/cover}
+    % \input{front/titlepage}
+    %  \input{front/declaration1}
+    % \input{front/declaration2}
+    
+    % table of contents
+    \afterpage{\blankpage}
+    \input{chapters/resumen} 
+    \input{chapters/motivation}    
+    \afterpage{\blankpage}
+
+    \clearpage
+    \setcounter{page}{1}
+    \pagenumbering{arabic}  
+    \tableofcontents
+    \listoffigures
+    \listoftables
+    
+ 
+    % chapters    
+    \input{chapters/chapter1-introduction}
+    \input{chapters/chapter2-metaheuristicas}
+    \input{chapters/chapter3-DE}
+    \input{chapters/chapter4-HDE}
+    \input{chapters/chapter5-resultados}
+    \input{chapters/chapter6-conclusions}
+    
+    \input{chapters/bibliography}
+\end{document}

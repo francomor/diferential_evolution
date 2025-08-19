@@ -1,0 +1,128 @@
+\chapter{Evolución Diferencial}
+\label{sec:DE}
+
+\section{Introducción}
+
+
+La \textit{Evolución Diferencial} (\textit{DE}) es considerada un subtipo de algoritmo evolutivo. A pesar de tener una estructura algorítmica muy simple, ha demostrado un nivel elevado de desempeño a la hora de resolver una amplia variedad de problemas muy complejos \cite{PriceStornLampinen}. Como toda metaheurística poblacional, \textit{DE} realiza una continua transformación de las distintas soluciones de la población. Es eficiente y eficaz, pues utiliza operaciones de bajo costo computaciones (usualmente lineal) para realizar la transformación de las soluciones. Son estas operaciones quienes se encargan de guiar la búsqueda a las regiones más prometedoras del espacio de soluciones.
+
+
+\textit{DE} fue propuesto inicialmente por Storn y Price en un reporte técnico en 1995 \cite{StornPrice} y en 1996 demostró su eficacia en una sesión especial de un congreso especializado en computación evolutiva \cite{StornPriceConference}. En el mismo, se aplicó la técnica con un gran éxito al resolver problemas de optimización en espacios continuos, superando a otros algoritmos evolutivos. En la actualidad, se han desarrollado distintas modificaciones para mejorar sus resultados.
+
+
+El éxito de \textit{DE} no es solo por su simplicidad, sino también por su capacidad para resolver problemas de optimización. La simplicidad está en su estructura algorítmica, pues solo se requieren unas pocas líneas de código para implementar el método, teniendo así el investigador la capacidad de invertir su tiempo y esfuerzo en entender el problema y no en la técnica que le da solución. Otra de las grandes ventajas, es la muy baja complejidad espacial que presenta respecto a otros algoritmos de optimización. Esto otorga la ventaja de poder obtener un algoritmo escalable a soluciones de casi cualquier número de variables, teniendo como limitante solo a la capacidad de la memoria de la computadora utilizada en la experimentación. Otro punto importante que vale la pena destacar es su capacidad para resolver correctamente una gran variedad de problemas complejos tanto discretos como continuos, con uno o varios óptimos, separables o no separables, etc.
+
+
+La robustez y la habilidad para converger a una solución óptima (o cercana a la óptima) es una característica importante que tiene \textit{DE}. Además, solo se requiere configurar un pequeño número de parámetros con respecto a otros algoritmos evolutivos. En \textit{DE}, el investigador solo necesita manipular tres parámetros para controlar el desempeño del algoritmo. Ahora bien, tener éxito o fracasar en la búsqueda de una solución a un problema depende, en gran parte, de identificar los valores correctos para esos parámetros. Por tal motivo, en algunos artículos se evita la ardua tarea de seleccionar \textit{a priori} los valores, aplicando un ajuste dinámico de los mismos \cite{QinSuganthan, BrestGreinerBoskovicMernik}.
+
+
+\section{Algoritmo \textit{DE}: propuesta de Storn \& Price}
+
+
+La propuesta original de \textit{DE} de Storn y Price \cite{PriceStornLampinen} fue pensada para resolver, específicamente, problemas de optimización que tengan su dominio en el conjunto de los reales. La solución óptima (o una cercana) se obtiene aplicando, sobre una población, un proceso iterativo donde se genera una nueva población de soluciones. En cada paso de este proceso, las nuevas soluciones surgen a través de las perturbaciones causadas por los operadores de mutación y recombinación sobre las soluciones actuales.
+
+
+En términos de \textit{DE}, una solución es un \textit{vector} de \textit{D} valores reales y cada componente representa una variable o parámetro del problema. Por lo tanto, los vectores son puntos en el espacio de \textit{D} dimensiones de números reales ($\mathbb{R}^{D}$). \textit{DE} debe encontrar la mejor solución realizando una búsqueda dentro de ese espacio.
+
+
+\textit{DE} obtiene la solución óptima (o una cercana a la misma) luego de finalizar un proceso de dos etapas. En la primera etapa, se genera una población de vectores. En la segunda etapa, \textit{DE} itera hasta alcanzar un punto de corte (p. ej., el número máximo de generaciones, $max_{gen}$) realizando tres fases básicas que componen el proceso evolutivo: mutación, recombinación y selección.
+
+
+DE depende de tres parámetros de control definidos por el investigador. Dos de los parámetros, $F$ y $Cr$, son valores reales positivos. El tercer parámetro, $N_P$ , es un valor entero positivo ($N_P > 0$).
+
+
+A continuación se pasan a explicar con mayor detalle cada una de las operaciones en las distintas etapas mencionadas.
+
+
+\subsection{Inicialización}
+
+
+La población inicial $P$ tiene $N_P$ vectores $x_{i} = (x_{i,1}, x_{i,2}, . . . , x_{i,D}) \in \mathbb{R}^{D}  (1 \leq i \leq N_P)$ distribuidos sobre el espacio de soluciones de manera aleatoria y uniforme. Cada componente $x_{i,j} \in \mathbb{R} (1 \leq j \leq D)$ es una variable de decisión del problema a optimizar. Es común que, por las características propias del problema, el espacio de soluciones pocas veces sea exactamente $\mathbb{R}^{D}$. Con frecuencia cada variable de decisión $x_{i,j}$ está acotada a un valor en el intervalo $[li_j, ls_j]$, donde $li_j$, $ls_j \in \mathbb{R}$ son el límite inferior y superior,  respectivamente.
+
+
+El algoritmo distribuye inicialmente los vectores en el espacio del problema, asignando un valor a cada variable. El valor de la variable $x_{i,j}$ se obtiene, generalmente, aplicando la siguiente ecuación:
+\begin{equation}
+x_{i,j} = li_{j} + U(0, 1) \times (ls_j - li_j)
+\end{equation}
+donde $U(0, 1)$ es un número aleatorio con distribución uniforme en el intervalo $[0, 1]$. Con el fin de evitar cualquier perjuicio en el desempeño del algoritmo, $U(0, 1)$ debe ser independiente de cualquier otro número aleatorio generado o por generar.
+
+
+\subsection{Mutación}
+
+
+En un contexto biológico, la mutación es un proceso súbito y espontáneo de variación en la información genética de un organismo vivo. En la computación evolutiva se apropió este término para definir un operador que cambia o perturba un elemento aleatorio del cromosoma. Por su parte, \textit{DE} obtiene un \textit{vector mutante}, también conocido como \textit{vector donador}, aplicando el operador de \textit{mutación diferencial}. Su uso es fundamental para el desempeño de \textit{DE}, debido a que centra la búsqueda en las zonas más prometedoras del espacio de soluciones.
+
+
+Uno de los esquemas más simples para implementar un operador de mutación
+diferencial es mostrado en la siguiente ecuación:
+\begin{equation}
+v_i^g = x_{r0}^g + F \times (x_{r1}^g - x_{r2}^g)
+\end{equation}
+donde por cada \textit{vector objetivo} $x_i^g (1 \leq i \leq N_P)$ de la población actual $P^g$( $0 \leq g \leq max_{gen}$ y $P^0$ es la población inicial), el operador crea un vector donador $v_i^g$. Para obtener el vector, primero, se elige aleatoriamente, de la población actual, un \textit{vector base} $x_{r0}^g$ diferente del vector objetivo. Luego se seleccionan de la población, de manera también aleatoria, otros dos vectores ($x_{r1}^g$ y $x_{r2}^g$) diferentes entre ellos y diferentes a los dos anteriores ($x_{i}^g$ y $x_{r0}^g$), y son utilizados para calcular el vector diferencia. Finalmente, el vector donador es obtenido sumando el vector diferencia escalado en un factor $F$ al vector base.
+
+
+El factor de escalado $F \in [0 . . . 1+)$ controla la amplificación de la diferencia entre los vectores $x_{r1}^g$ y $x_{r2}^g$ usados para la exploración del espacio, y así evitar que se produzca un estancamiento en el proceso de búsqueda. Comúnmente, $F$ no es mayor que $1$, aunque por definición no existe un límite superior para el parámetro. Al definir $F$, el algoritmo cambia automáticamente el tamaño del movimiento que van a realizar los vectores sobre el espacio. A lo largo de las generaciones, el vector diferencia adapta la búsqueda al paisaje (\textit{landscape} en inglés) de la función objetivo. Claramente, existe una gran cantidad de posibles vectores diferencia cuando los valores de las variables están muy dispersos, pues si las variables están convergiendo, la cantidad de posibles vectores diferencia pasa a ser muy chica.
+
+
+\subsection{Recombinación}
+
+
+Luego de aplicar el operador de mutación, el vector donador es modificado a través del operador de recombinación, con el objetivo de incrementar la diversidad en la población. El operador intercambia componentes del vector donador $v_i^g$ con el vector objetivo $x_i^g$. Al terminar con el proceso, se obtiene el \textit{vector de prueba} $u_i^g$.
+
+
+En la recombinación binomial, se analiza cada componente del vector objetivo en forma independiente para decidir si se realiza el intercambio por el del vector donador. La siguiente ecuación muestra cómo se obtienen las componentes del vector prueba:
+\begin{equation}
+u_{i,j}^g = \left\lbrace
+\begin{array}{ll}
+v_{i,j}^g & \textup{si } r_j < Cr \vee j = j_r\\
+x_{i,j}^g & \textup{en otro caso} 
+\end{array}
+\right.
+\end{equation}
+donde $r_j=U(0, 1)$ es un valor aleatorio uniformemente distribuido dentro del intervalo [0,1]. $j_r$ es también un valor aleatorio pero uniformemente distribuido en el conjunto \{1, ... ,$D$\} y, finalmente, $Cr$ es el parámetro de la probabilidad de recombinación de \textit{DE}.
+
+
+\subsection{Selección}
+
+
+El tercer y último paso en el proceso evolutivo de \textit{DE} es la operación de \textit{selección}. Utilizando la función objetivo $f(\cdot)$, se compara el vector de prueba $u_{i,j}^g$ y el vector objetivo $x_{i,j}^g$. El mejor de ambos vectores es elegido para formar parte de la población de la próxima generación y el otro vector es descartado. La siguiente ecuación muestra cómo se realiza la operación:
+\begin{equation}
+x_{i}^{g+1} = \left\lbrace
+\begin{array}{ll}
+u_{i}^g & \textup{si } f(u_{i}^g) \textup{ \textit{es igual o mejor que} } f(x_{i}^g)\\
+x_{i,j}^g & \textup{en otro caso} 
+\end{array}
+\right.
+\end{equation}
+Cuando, por ejemplo, se está minimizando la función objetivo, el vector prueba integrará la nueva población si $f(u_{i}^g)$ es menor o igual a $f(x_{i}^g)$. En caso de que sean iguales, el operador se ve obligado a seleccionar el vector prueba con el fin de moverse en regiones planas del paisaje de la función objetivo.
+
+
+El esquema de selección en \textit{DE} compara al vector prueba y al objetivo que tienen el mismo índice y retiene el mejor de ambos. Esta competencia entre padres e hijos crea una nueva población con el mismo tamaño que la anterior y con un desempeño igual o superior a la actual. Como no existe un deterioro en la calidad de las soluciones, \textit{DE} es un algoritmo evolutivo \textit{elitista}. Esta propiedad es importante para alcanzar una convergencia al óptimo global \cite{Rudolph}. 
+
+
+\section{Descripción de \textit{DE}}
+
+
+El Algoritmo \ref{alg:algoritmoDE} muestra el proceso iterativo de \textit{DE} en un formato de pseudocódigo. Cada una de las operaciones mencionadas en las secciones anteriores están aplicadas en el algoritmo: \textit{inicialización} en la línea 1, \textit{mutación} en línea 5, \textit{recombinación} en línea 6 y \textit{selección} en línea 7. El criterio de finalización de \textit{DE} es libremente elegido por el investigador de acuerdo al problema a resolver. Podría ser un simple número de iteraciones ($max_{gen}$) especificado por el investigador o hasta alcanzar un número determinado de evaluaciones de la función objetivo o hasta lograr un valor objetivo específico. Cualquiera sea el criterio, su elección tiene una influencia directa sobre la mejor solución $x_{best}$ obtenida por el algoritmo (línea 12). La función \textit{agregar} (línea 8) incorpora un nuevo miembro en la población de la próxima generación.
+
+
+\begin{algorithm} [H]
+    \caption{Pseudocódigo del algoritmo Evolución Diferencial (DE)} \label{alg:algoritmoDE}
+    \begin{algorithmic} [1]
+    \Require {$F, Cr, N_p$} 
+    \Ensure {$x_{best}$} 
+        \State inicializar($P$,$N_p$) 
+        \State $g \leftarrow 0$
+        \While {no se alcance la condición de finalización}
+            \For {cada vector $x_{i}^g$ de $P^g$}
+                \State $v_{i}^g \leftarrow $ mutación($x_{i}^g, P^g, F$) 
+                \State $u_{i}^g \leftarrow $ recombinación($x_{i}^g, v_{i}^g, Cr$)
+                \State $x_{i}^{g+1} \leftarrow $ selección($x_{i}^g, u_{i}^g$)
+                \State agregar($P^{g+1}, x_{i}^{g+1}$) 
+            \EndFor
+            \State $g \leftarrow g+1$ 
+        \EndWhile
+        \State$x_{best} \leftarrow $mejor-solución($P^{g}$)
+
+    \end{algorithmic}
+\end{algorithm}

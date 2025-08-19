@@ -1,0 +1,85 @@
+\section{Descripción del proyecto y justificación} 
+
+Las técnicas de optimización juegan un rol importante en el campo de la ciencia y la ingeniería. En las últimas décadas, se han desarrollado varios algoritmos para resolver problemas de optimización complejos. La biología evolutiva o el comportamiento de enjambres inspiraron la mayoría de esos métodos. En este marco evolutivo o de inteligencia de enjambre se han propuesto varias clases de algoritmos que incluyen: algoritmos genéticos \cite{Goldberg, Holland3}, algoritmos meméticos \cite{Moscato}, evolución diferencial (DE) \cite{StornPrice2}, optimización de colonias de hormigas (ACO) \cite{Colorni}, optimización por enjambre de partículas (PSO) \cite{Eberhart}, algoritmo de colonia de abejas artificiales (ABC) \cite{KarabogaBasturk}, entre otros.
+
+
+La evolución diferencial es un algoritmo evolutivo desarrollado para resolver funciones de espacios continuos. Es un método de búsqueda estocástico. Comparado con otros algoritmos metaheurísticos basados en población, DE enfatiza más la mutación que la recombinación. DE muta un vector con una ayuda de pares de vectores elegidos aleatoriamente en la misma población. La mutación guía a los vectores hacia el óptimo global. La distribución de la diferencia entre vectores muestreados aleatoriamente se determina por la distribución de esos vectores. Como la distribución de esos vectores está principalmente determinada por una determinada función objetivo, los sesgos en los que DE intenta optimizar el problema coinciden con los de la función a optimizar.
+
+
+DE ha sido recientemente usado para optimización global en una gran variedad de áreas de problemas tal como planificación \cite{Gnanavel}, diseño ingenieril \cite{Melo}, problemas de optimización con restricción \cite{Ali}, entre otros \cite{Juang,Yang}. En particular, dentro de los ambientes de manufactura, nos encontramos con el problema de planificación job shop flexible (FJSSP). Está probado que este problema es NP-duro \cite{GareyJohnson}, debido a que se tiene que asignar cada operación de un trabajo a una máquina apropiada (problema de ruteo) y secuenciar las operaciones asignadas en cada máquina (problema de secuenciamiento). El objetivo que se persigue es minimizar el tiempo necesario para completar todos los trabajos. A medida que aumenta la cantidad de trabajos, por consiguiente la cantidad de operaciones, y la cantidad de máquinas disponibles, la complejidad del problema crece y por consiguiente la complejidad computacional para resolverlo. Esto trae aparejado tiempos de procesamiento altos. Una manera de hacer frente a estos tiempos de  procesamiento alto es utilizar alguna técnica de paralelización que permita distribuir el trabajo en los distintos procesadores y/o cores de nuestro equipo informático. Una de las estrategias es utilizar una configuración paralela maestro-esclavos, utilizando una interfaz de programación de aplicaciones (API), como lo es openMP, para la programación multiproceso de memoria compartida.
+
+
+\section{Objetivos}
+
+El objetivo general de este trabajo es: diseñar un algoritmo DE hibrido para resolver el FJSSP utilizando
+estrategias de distribución del trabajo computacional.
+
+
+Como objetivos específicos, para alcanzar el objetivo general, se plantean los siguientes:
+\begin{itemize}
+    \item Realizar un análisis del estado del arte sobre algoritmos DE y propuestas paralelas.
+    \item Realizar un análisis del estado del arte en la resolución del FSJJP con algoritmos evolutivos.
+    \item Diseñar e implementar el DE híbrido para el FSJJP.
+    \item Diseñar e implementar el DE híbrido paralelo para el FSJJP.
+    \item Realizar la experimentación correspondiente y el análisis de los resultados obtenidos.
+\end{itemize}
+
+
+\section{Asignaturas relacionadas}
+Para alcanzar los objetivos propuestos, se hará uso de los conocimientos obtenidos en las siguientes asignaturas:
+\begin{itemize}
+    \item Estructura de Datos y Algoritmos
+    \item Probabilidad y Estadística
+    \item Sistemas Distribuidos I
+    \item Sistemas Distribuidos II
+    \item Sistemas Inteligentes
+\end{itemize}
+
+\section{Metodología}
+
+A continuación se detalla la metodología que se adoptará para realizar este trabajo, detallando las fases en las que se divide.
+
+
+La primera fase consistirá en la revisión de material bibliográfico relacionado con algoritmos evolutivos, haciendo especial énfasis en algoritmos de evolución diferencial, a fin de adquirir conocimientos necesarios sobre estas técnicas para, en etapas posteriores, poder concretar una propuesta algorítmica. Además, en esta etapa de revisión se estudiará el estado del arte en la problemática abordada FJSSP mediante la solución con DE y sus variantes híbridas. Esta fase permitirá identificar particularidades de las distintas alternativas de solución que resulten más prometedoras para resolver el FJSSP, y que se puedan integrar en una propuesta posterior.
+
+
+En una segunda fase, será necesario el análisis y estudio de posibles paralelizaciones de metaheurísticas, con un enfoque centrado en paralelizar algoritmos de evolución diferencial, con el fin de poder lograr un algoritmo híbrido paralelo con grandes ventajas en tiempo y utilización de recursos computacionales.
+
+
+En una tercera fase, se continuará con el diseño y la implementación del DE híbrido paralelo para resolver el FJSSP siguiendo el paradigma procedural, haciendo hincapié en la representación del problema. 
+ 
+
+Concretada la fase anterior, la siguiente consistirá en la puesta a punto del algoritmo desarrollado. Para lo cual se deben realizar ejecuciones preliminares y analizar los resultados de las mismas para determinar la mejor configuración de parámetros. Una vez definidos los mismos, se procederá al desarrollo de la experimentación completa para finalizar con el análisis de los resultados obtenidos y su estudio estadístico.
+
+
+En la fase final se realizará la escritura del informe del proyecto final incluyendo el desarrollo realizado y el análisis de los resultados obtenidos.
+
+
+\section{Cronograma de trabajo}
+A continuación se detallan las distintas actividades, y su planificación en el tiempo, que surgen para la concreción de los objetivos parciales.
+
+\begin{enumerate}
+    \item Estudiar y analizar el estado del arte en relación a algoritmo DE.
+    \item Estudiar y analizar el estado del arte en relación a posibles paralelizaciones de
+metaheurísticas.
+    \item Diseñar la forma de paralelizar un algoritmo DE para resolver el FJSSP e implementar el algoritmo propuesto, evaluando alternativas de mejora.
+    \item Realizar la experimentación y posterior análisis de resultados.
+    \item Documentar el trabajo realizado.
+\end{enumerate}
+
+Las duraciones estimadas (en horas) de las distintas actividades se muestran en la siguiente tabla:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Actividad} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} \\ \hline
+\textbf{Duración}  & 30         & 20         & 50         & 60         & 40         \\ \hline
+\end{tabular}
+\end{table}
+
+Tiempo total: 200 horas.
+
+
+\section{Resultados esperados}
+Obtener un software que permita resolver el problema de job shop flexible explotando el paralelismo en su ejecución 
